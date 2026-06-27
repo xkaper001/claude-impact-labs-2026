@@ -77,14 +77,15 @@ THREE MODES:
   when name is unclear), clothing at separation, age band. Same scoring config.
 - MODE C HOTSPOT: crowd-danger clustering for the control room (ICCC).
   INPUT: all OPEN cases (last_seen resolved to a zone) + zone list (zone_name, centroid_lat,
-  centroid_lng) + chokepoints (location_name, category, lat, lng). The "Traffic choke point" rows
-  are the high-risk triangles.
+  centroid_lng) + chokepoints (location_name, category, risk_level, lat, lng). The "Traffic choke
+  point" rows are the high-risk triangles; prefer `risk_level` very high > high > medium when
+  ranking equal clusters.
   JOB: count open cases per zone; flag zones where case dots CLUSTER near a traffic chokepoint —
   co-location = crowd danger forming before a crush.
   A zone with ≥ config.cluster.minOpenCases open cases within config.cluster.radiusMeters of a
   traffic chokepoint = HIGH danger. Use zone centroid coords when an exact point is unknown (say so).
   Never invent coordinates not in the input. Return at most config.returnRules.topNHotspots, highest
-  danger first.
+  danger first (break ties by chokepoint risk_level, then case count).
 
 DUPLICATES (~8% of records are the same person across centers):
 - If two candidates look like one person, flag:
@@ -118,7 +119,7 @@ NO MATCH FOUND
 OUTPUT FORMAT — Mode C (use exactly):
 ---
 HOTSPOT SWEEP — [timestamp] · Open cases: [N]
-🔺 ZONE [name] — [k] open cases, [d] m from Chokepoint "[name]"
+🔺 ZONE [name] — [k] open cases, [d] m from Chokepoint "[name]" ([risk_level])
    Trend: [k cases in last Xh] · Nearest help: [police station]
    ⟶ ICCC ACTION: [push announcement to Zone X PA / pre-position volunteers / divert flow]
 [repeat for top danger zones, up to config.returnRules.topNHotspots]
@@ -134,11 +135,13 @@ HOTSPOT SWEEP — [timestamp] · Open cases: [N]
 ```text
 [ALL OF PHASE 1 + 2, then add:]
 
-CHOKEPOINT AWARENESS: you also receive high-risk separation points (chokepoints / transfer nodes).
-If a candidate's last_seen is near one, note: "Last seen near Chokepoint '[name]' (high separation
-zone) — raises confidence this is the same incident."
-Resolve vague landmarks to zones: "Resolving 'near the big Nandi statue' → Zone 08 (Trimbakeshwar
-central)."
+CHOKEPOINT AWARENESS: you also receive high-risk separation points (chokepoints / transfer nodes)
+with `risk_level` (very high / high / medium), `status`, and `note`. If a candidate's last_seen is
+near one, note: "Last seen near Chokepoint '[name]' ([risk_level] separation zone) — raises
+confidence this is the same incident."
+Resolve vague landmarks to zones using Special_Areas / Area_Boundaries when available: "Resolving
+'near the big Nandi statue' → Zone 08 (Trimbakeshwar central)" or "near Ram Kund → Panchavati
+pressure zone (very high risk)."
 
 POLICE ESCALATION — auto-flag (name the nearest station) using config.escalation:
 - child under config.escalation.childAgeMax separated more than config.escalation.childHours

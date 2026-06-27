@@ -1,86 +1,86 @@
-location_name,category,longitude,latitude
-Dwarka Circle / Dwarka Chowk,Traffic choke point,73.79564,19.98695
-Nashik Road-Dwarka corridor,Traffic choke point,73.8014105,19.9871372
-Kathe Galli,Traffic choke point,73.8078,19.9739
-Fame Signal,Traffic choke point,73.821,19.9645
-Upnagar,Traffic choke point,73.8167,19.9717777
-Upnagar Junction,Traffic choke point,73.8354,19.9549
-Datta Mandir Signal,Traffic choke point,73.8395,19.9515
-Dr. Ambedkar Nagar,Traffic choke point,73.846,19.9529
-Mumbai Naka,Traffic choke point,73.7839866,19.9870794
-Panchavati / Ramkund access zone,No-vehicle pressure zone,73.79062,20.0067
-Ramkund,No-vehicle pressure zone,73.79062,20.0067
-Godavari Ghat approaches,No-vehicle pressure zone,73.7902,20.0064
-Nashik Road Railway Station,Transfer node,73.84059,19.94884
-Bitco Signal / Bitco Chowk,Traffic choke point,73.839,19.9497
-CBS / Central Bus Stand,Transfer node,73.7799,19.9972
-Thakkar Bazaar / New Thakkar Bazar,Transfer node,73.7774,19.9964
-Trimbak Road exit / Nashik-Trimbak Road,Traffic choke point,73.6615256,19.9663708
-ABB Circle / ABB Signal,Traffic choke point,73.7505,20.0029
-Adgaon,Traffic choke point,73.4130156,20.0251185
-Jatra Hotel,Traffic choke point,73.8235,20.0358
-Amrutdham,Traffic choke point,73.8206889,20.0240143
-K.K. Wagh College / K.K. Wagh belt,Traffic choke point,73.8219246,20.0134117
-Canada Corner,Traffic choke point,73.769685,20.0025076
-Gangapur Naka,Traffic choke point,73.7638,20.0078
-Jehan Circle,Traffic choke point,73.7592,20.0028
-Ashok Stambh,Traffic choke point,73.7848996,20.006844
-Ramsetu Bridge,Traffic choke point,73.789,20.0082
-Dahipul,Traffic choke point,73.786,20.0025
-Delhi Darwaja,Traffic choke point,73.7875,20.0055
-Nandur Naka,Traffic choke point,73.831,20.0048
-Sant Janardan Swami Bridge,Traffic choke point,73.8173,20.0019
-Jail Road / Currency Note Press belt,Traffic choke point,73.838949,19.9647084
-Kulkarni Garden to Sadhu Vaswani Road,Parking,73.7695,20.0045
-Kulkarni Garden to BSNL Office,Parking,73.773,20.0038
-Jyoti Store-Rishikesh Hospital-Gangapur Naka,Parking,73.7655,20.0073
-Pramod Mahajan Park Entrance,Parking,73.8306054,20.0231553
-Gangapur Naka to Jehan Circle,Parking,73.7615,20.0053
-Jehan Circle to Guruji Hospital,Parking,73.7584,20.002
-Jehan Circle to ABB Circle,Parking,73.7548,20.0028
-Guruji Hospital to Pipeline Road,Parking,73.7561,20.0031
-Modak Point to Khadkali Road,Parking,73.7854,19.9972
-Thattenagar Road,Parking,73.7678,20.0007
-Behind Kulkarni Udyan,Parking,73.77,20.0042
-Shraddha Petrol Pump to Bestside Mall,Parking,73.7615,19.9988
-CBS to Shalimar,Parking,73.7836,19.9992
-Canada Corner to Vise Mala,Parking,73.774,20.0035
-Gadge Maharaj Bridge to Talakuteshwar,Parking,73.792,20.0057
-Model Colony Chowk to Bhosla Gate,Parking,73.767,20.0047
-Pandit Colony Palika Building,Parking,73.7742,20.0005
-Shalimar to Nehru Garden,Parking,73.7863,20.001
-HDFC Chowk to MSEB Office,Parking,73.773,20.0003
-"Chhatrapati Shivaji Statue to Dr. Ambedkar Statue, Nashik Road",Parking,73.8409,19.9521
-Mahatma Gandhi Road,Parking,73.784,20.0004
-Canada Corner to Panasonic Gallery,Parking,73.7755,20.0029
-Bitco Signal to Mahatma Gandhi Road,Parking,73.8408,19.9491
-Jehan Circle to Nelinkar Circle,Parking,73.757,20.002
-Shaheed Circle to Model Colony Circle,Parking,73.7675,20.0042
-Veterinary Clinic,Parking,73.7866,19.9975
-BD Bhalekar School Ground,Parking,73.7812,19.9987
-Anna Shastri Main Road,Parking,73.8378,19.951
-Angora Complex,Parking,73.778,20.0002
-Shatabdi Hospital,Parking,73.7840439,19.988147
-Rajur Bahula,Outer parking,73.673,19.946
-Dugaon Phata,Outer parking,73.719,20.031
-Thakkar Maidan,Outer parking,73.7725,20.004
-Adgaon outer parking,Outer parking,73.838,20.042
-Mhasrul,Outer parking,73.8049507,20.0463365
-Madsangavi,Outer parking,73.883,20.066
-Chincholi,Outer parking,73.9094495,19.8975833
-Khambale,Outer parking,73.632102,19.9548411
-Pahine,Outer parking,73.5527429,19.8993936
-Talwade,Outer parking,73.5553417,19.9736973
-Mahamarg Bus Stand,Transfer node,73.7829469,19.9888004
-Satpur Bus Stand,Transfer node,73.7319231,19.9912276
-Sharad Chandra Pawar Market,Transfer node,73.7905,20.0185
-Nilgiri Baug,Transfer node,73.8176,20.0132
-Lakshmi Narayan Trust Hanuman Nagar,Transfer node,73.8038,20.0224
-Sinnar Bypass Market Yard,Transfer node,73.858,19.932
-Brahma Valley,Transfer node,73.574,19.9264
-Pegalwadi,Transfer node,73.5537531,19.9393065
-Peth Road parking belt,Parking belt,73.7775,20.0305
-Dindori Road parking belt,Parking belt,73.8032903,20.0344735
-Dhule Road parking belt,Parking belt,73.833,20.04
-Pune Road parking belt,Parking belt,73.8592833,18.7572012
-Mumbai Road parking belt,Parking belt,73.8638745,20.0361024
+location_name,category,risk_level,status,longitude,latitude,source_url,note
+Dwarka Circle / Dwarka Chowk,Traffic choke point,very high,confirmed 2027 project,73.79564,19.98695,https://www.freepressjournal.in/pune/centre-approves-214-crore-fornashiks-dwarka-chowk-upgrade,"Vital artery connecting Mumbai-Agra NH, Nashik Road, Panchavati, city centre and industrial routes; specifically upgraded for Kumbh readiness."
+Nashik Road-Dwarka corridor,Traffic choke point,very high,confirmed 2027 project,73.8014105,19.9871372,https://infra.economictimes.indiatimes.com/news/urban-transportation/residents-cheer-10-lane-plan-of-nashik-road-dwarka-section/128244576,Key commuter and pilgrim corridor where minor breakdowns can create long tailbacks.
+Kathe Galli,Traffic choke point,high,confirmed 2027 project,73.8078,19.9739,https://infra.economictimes.indiatimes.com/news/urban-transportation/residents-cheer-10-lane-plan-of-nashik-road-dwarka-section/128244576,Named pinch point on Nashik Road-Dwarka stretch.
+Fame Signal,Traffic choke point,high,confirmed 2027 project,73.821,19.9645,https://infra.economictimes.indiatimes.com/news/urban-transportation/residents-cheer-10-lane-plan-of-nashik-road-dwarka-section/128244576,Named signal choke point on Nashik Road-Dwarka stretch.
+Upnagar,Traffic choke point,high,confirmed 2027 project,73.8167,19.9717777,https://infra.economictimes.indiatimes.com/news/urban-transportation/residents-cheer-10-lane-plan-of-nashik-road-dwarka-section/128244576,Named congestion area on Nashik Road-Dwarka stretch.
+Upnagar Junction,Traffic choke point,high,confirmed 2027 project,73.8354,19.9549,https://infra.economictimes.indiatimes.com/news/urban-transportation/residents-cheer-10-lane-plan-of-nashik-road-dwarka-section/128244576,Named congestion junction on Nashik Road-Dwarka stretch.
+Datta Mandir Signal,Traffic choke point,high,confirmed 2027 project,73.8395,19.9515,https://infra.economictimes.indiatimes.com/news/urban-transportation/residents-cheer-10-lane-plan-of-nashik-road-dwarka-section/128244576,Named signal choke point on Nashik Road-Dwarka stretch.
+Dr. Ambedkar Nagar,Traffic choke point,medium,confirmed 2027 project,73.846,19.9529,https://infra.economictimes.indiatimes.com/news/urban-transportation/residents-cheer-10-lane-plan-of-nashik-road-dwarka-section/128244576,Named congestion area on Nashik Road-Dwarka stretch.
+Mumbai Naka,Traffic choke point,high,analyst derived from route behavior,73.7839866,19.9870794,https://infra.economictimes.indiatimes.com/news/urban-transportation/residents-cheer-10-lane-plan-of-nashik-road-dwarka-section/128244576,Likely spillover point when traffic bypasses Dwarka via Kathe Galli-Mumbai Naka.
+Panchavati / Ramkund access zone,No-vehicle pressure zone,very high,confirmed Kumbh pressure zone,73.79062,20.0067,https://www.travelandtourworld.com/news/article/complete-guide-to-nashik-kumbh-mela-2027-verified-travel-routes-accommodation-and-safety-tips/,Main sacred bathing pressure area; private vehicles expected to be shifted to outer parking on peak days.
+Ramkund,No-vehicle pressure zone,very high,confirmed Kumbh pressure zone,73.79062,20.0067,https://www.travelandtourworld.com/news/article/complete-guide-to-nashik-kumbh-mela-2027-verified-travel-routes-accommodation-and-safety-tips/,Core bathing site and crowd-density hotspot.
+Godavari Ghat approaches,No-vehicle pressure zone,very high,confirmed Kumbh pressure zone,73.7902,20.0064,https://www.travelandtourworld.com/news/article/complete-guide-to-nashik-kumbh-mela-2027-verified-travel-routes-accommodation-and-safety-tips/,Cluster of bathing-ghat approaches needing pedestrian segregation and emergency access.
+Nashik Road Railway Station,Transfer node,very high,confirmed rail planning,73.84059,19.94884,https://www.devdiscourse.com/article/business/3860652-comprehensive-plan-unveiled-for-crowd-management-at-kumbh-mela,"Major railway arrival node; Central Railway preparing holding areas, CCTV and announcements."
+Bitco Signal / Bitco Chowk,Traffic choke point,high,black spot / parking route,73.839,19.9497,https://cdnbbsr.s3waas.gov.in/s35dec707028b05bcbd3a1db5640f842c5/uploads/2025/01/202501241645153799.pdf,Station-side control point and black-spot reference near Nashik Road.
+CBS / Central Bus Stand,Transfer node,high,parking / transfer planning,73.7799,19.9972,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,Inner-city transfer and parking corridor around CBS-Shalimar.
+Thakkar Bazaar / New Thakkar Bazar,Transfer node,high,historical route reference,73.7774,19.9964,https://kumbhmela.com/nasik-kumbh-2015/how-to-get-there/,Historic Kumbh bus movement node near city core.
+Trimbak Road exit / Nashik-Trimbak Road,Traffic choke point,high,confirmed 2027 project,73.6615256,19.9663708,https://www.travelandtourworld.com/news/article/complete-guide-to-nashik-kumbh-mela-2027-verified-travel-routes-accommodation-and-safety-tips/,Primary link from Nashik to Trimbakeshwar; expansion planned for Kumbh readiness.
+ABB Circle / ABB Signal,Traffic choke point,high,black spot / route reference,73.7505,20.0029,https://cdnbbsr.s3waas.gov.in/s35dec707028b05bcbd3a1db5640f842c5/uploads/2025/01/202501241645153799.pdf,Important western-side control point on Trimbak/Satpur movement.
+Adgaon,Traffic choke point,high,black spot / historical parking,73.4130156,20.0251185,https://cdnbbsr.s3waas.gov.in/s35dec707028b05bcbd3a1db5640f842c5/uploads/2025/01/202501241645153799.pdf,Northern approach and historic outer parking belt.
+Jatra Hotel,Traffic choke point,medium,black spot reference,73.8235,20.0358,https://cdnbbsr.s3waas.gov.in/s35dec707028b05bcbd3a1db5640f842c5/uploads/2025/01/202501241645153799.pdf,Northern approach black-spot area to monitor for pilgrim bus inflow.
+Amrutdham,Traffic choke point,medium,black spot reference,73.8206889,20.0240143,https://cdnbbsr.s3waas.gov.in/s35dec707028b05bcbd3a1db5640f842c5/uploads/2025/01/202501241645153799.pdf,Northern approach black-spot area.
+K.K. Wagh College / K.K. Wagh belt,Traffic choke point,medium,black spot / route reference,73.8219246,20.0134117,https://cdnbbsr.s3waas.gov.in/s35dec707028b05bcbd3a1db5640f842c5/uploads/2025/01/202501241645153799.pdf,Northern/eastern approach and route return reference.
+Canada Corner,Traffic choke point,medium,parking corridor,73.769685,20.0025076,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,Parking and movement corridor around Canada Corner.
+Gangapur Naka,Traffic choke point,medium,parking corridor,73.7638,20.0078,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,Parking and local movement corridor.
+Jehan Circle,Traffic choke point,medium,parking corridor,73.7592,20.0028,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,Parking junction feeding ABB/Gangapur belts.
+Ashok Stambh,Traffic choke point,high,historical route reference,73.7848996,20.006844,https://kumbhmela.com/nasik-kumbh-2015/how-to-get-there/,Historic Kumbh route point toward Panchavati/Ramkund.
+Ramsetu Bridge,Traffic choke point,high,historical route reference,73.789,20.0082,https://kumbhmela.com/nasik-kumbh-2015/how-to-get-there/,Bridge crossing on historic Kumbh route to Gandhi Tank/Ramkund side.
+Dahipul,Traffic choke point,high,historical route reference,73.786,20.0025,https://kumbhmela.com/nasik-kumbh-2015/how-to-get-there/,Core-city pinch point on historic Trimbak-side route into Panchavati.
+Delhi Darwaja,Traffic choke point,medium,historical route reference,73.7875,20.0055,https://kumbhmela.com/nasik-kumbh-2015/how-to-get-there/,Historic approach to Rokdoba Maidan / old-city crowd movement.
+Nandur Naka,Traffic choke point,medium,historical route reference,73.831,20.0048,https://kumbhmela.com/nasik-kumbh-2015/how-to-get-there/,Eastern approach route for Aurangabad/Odha inflow.
+Sant Janardan Swami Bridge,Traffic choke point,medium,historical route reference,73.8173,20.0019,https://kumbhmela.com/nasik-kumbh-2015/how-to-get-there/,Bridge crossing on eastern and Nashik Road Kumbh routes.
+Jail Road / Currency Note Press belt,Traffic choke point,medium,historical route reference,73.838949,19.9647084,https://kumbhmela.com/nasik-kumbh-2015/how-to-get-there/,Historic movement route from Nashik Road/Sinnar side toward ghats.
+Kulkarni Garden to Sadhu Vaswani Road,Parking,medium,confirmed 2027 parking list,73.7695,20.0045,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed parking corridor; exact entry/exit to be field-verified.
+Kulkarni Garden to BSNL Office,Parking,medium,confirmed 2027 parking list,73.773,20.0038,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed parking corridor; exact entry/exit to be field-verified.
+Jyoti Store-Rishikesh Hospital-Gangapur Naka,Parking,medium,confirmed 2027 parking list,73.7655,20.0073,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed parking corridor; exact entry/exit to be field-verified.
+Pramod Mahajan Park Entrance,Parking,medium,confirmed 2027 parking list,73.8306054,20.0231553,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed parking corridor; exact entry/exit to be field-verified.
+Gangapur Naka to Jehan Circle,Parking,medium,confirmed 2027 parking list,73.7615,20.0053,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed parking corridor; exact entry/exit to be field-verified.
+Jehan Circle to Guruji Hospital,Parking,medium,confirmed 2027 parking list,73.7584,20.002,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed parking corridor; exact entry/exit to be field-verified.
+Jehan Circle to ABB Circle,Parking,medium,confirmed 2027 parking list,73.7548,20.0028,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed parking corridor; exact entry/exit to be field-verified.
+Guruji Hospital to Pipeline Road,Parking,medium,confirmed 2027 parking list,73.7561,20.0031,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed parking corridor; exact entry/exit to be field-verified.
+Modak Point to Khadkali Road,Parking,medium,confirmed 2027 parking list,73.7854,19.9972,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed parking corridor; exact entry/exit to be field-verified.
+Thattenagar Road,Parking,medium,confirmed 2027 parking list,73.7678,20.0007,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed parking corridor; exact entry/exit to be field-verified.
+Behind Kulkarni Udyan,Parking,medium,confirmed 2027 parking list,73.77,20.0042,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed parking corridor; exact entry/exit to be field-verified.
+Shraddha Petrol Pump to Bestside Mall,Parking,medium,confirmed 2027 parking list,73.7615,19.9988,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed parking corridor; exact entry/exit to be field-verified.
+CBS to Shalimar,Parking,medium,confirmed 2027 parking list,73.7836,19.9992,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed parking corridor; exact entry/exit to be field-verified.
+Canada Corner to Vise Mala,Parking,medium,confirmed 2027 parking list,73.774,20.0035,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed parking corridor; exact entry/exit to be field-verified.
+Gadge Maharaj Bridge to Talakuteshwar,Parking,medium,confirmed 2027 parking list,73.792,20.0057,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed parking corridor; exact entry/exit to be field-verified.
+Model Colony Chowk to Bhosla Gate,Parking,medium,confirmed 2027 parking list,73.767,20.0047,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed parking corridor; exact entry/exit to be field-verified.
+Pandit Colony Palika Building,Parking,medium,confirmed 2027 parking list,73.7742,20.0005,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed parking corridor; exact entry/exit to be field-verified.
+Shalimar to Nehru Garden,Parking,medium,confirmed 2027 parking list,73.7863,20.001,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed parking corridor; exact entry/exit to be field-verified.
+HDFC Chowk to MSEB Office,Parking,medium,confirmed 2027 parking list,73.773,20.0003,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed parking corridor; exact entry/exit to be field-verified.
+"Chhatrapati Shivaji Statue to Dr. Ambedkar Statue, Nashik Road",Parking,medium,confirmed 2027 parking list,73.8409,19.9521,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed parking corridor; exact entry/exit to be field-verified.
+Mahatma Gandhi Road,Parking,medium,confirmed 2027 parking list,73.784,20.0004,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed parking corridor; exact entry/exit to be field-verified.
+Canada Corner to Panasonic Gallery,Parking,medium,confirmed 2027 parking list,73.7755,20.0029,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed parking corridor; exact entry/exit to be field-verified.
+Bitco Signal to Mahatma Gandhi Road,Parking,medium,confirmed 2027 parking list,73.8408,19.9491,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed parking corridor; exact entry/exit to be field-verified.
+Jehan Circle to Nelinkar Circle,Parking,medium,confirmed 2027 parking list,73.757,20.002,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed parking corridor; exact entry/exit to be field-verified.
+Shaheed Circle to Model Colony Circle,Parking,medium,confirmed 2027 parking list,73.7675,20.0042,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed parking corridor; exact entry/exit to be field-verified.
+Veterinary Clinic,Parking,medium,confirmed 2027 parking list,73.7866,19.9975,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed parking corridor; exact entry/exit to be field-verified.
+BD Bhalekar School Ground,Parking,high,confirmed 2027 parking list,73.7812,19.9987,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed off-street parking site; exact usable area/capacity to be field-verified.
+Anna Shastri Main Road,Parking,high,confirmed 2027 parking list,73.8378,19.951,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed off-street parking site; exact usable area/capacity to be field-verified.
+Angora Complex,Parking,high,confirmed 2027 parking list,73.778,20.0002,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed off-street parking site; exact usable area/capacity to be field-verified.
+Shatabdi Hospital,Parking,high,confirmed 2027 parking list,73.7840439,19.988147,https://www.lokmattimes.com/nashik/nashik-kumbh-mela-2027-nmc-chalks-out-parking-plan-35-locations-identified-a519/,NMC-listed off-street parking site; exact usable area/capacity to be field-verified.
+Rajur Bahula,Outer parking,medium,historical 2015 reference,73.673,19.946,https://kumbhmela.com/nasik-kumbh-2015/how-to-get-there/,Historical Simhastha parking reference; validate against final 2027 traffic notification.
+Dugaon Phata,Outer parking,medium,historical 2015 reference,73.719,20.031,https://kumbhmela.com/nasik-kumbh-2015/how-to-get-there/,Historical Simhastha parking reference; validate against final 2027 traffic notification.
+Thakkar Maidan,Outer parking,medium,historical 2015 reference,73.7725,20.004,https://kumbhmela.com/nasik-kumbh-2015/how-to-get-there/,Historical Simhastha parking reference; validate against final 2027 traffic notification.
+Adgaon outer parking,Outer parking,medium,historical 2015 reference,73.838,20.042,https://kumbhmela.com/nasik-kumbh-2015/how-to-get-there/,Historical Simhastha parking reference; validate against final 2027 traffic notification.
+Mhasrul,Outer parking,medium,historical 2015 reference,73.8049507,20.0463365,https://kumbhmela.com/nasik-kumbh-2015/how-to-get-there/,Historical Simhastha parking reference; validate against final 2027 traffic notification.
+Madsangavi,Outer parking,medium,historical 2015 reference,73.883,20.066,https://kumbhmela.com/nasik-kumbh-2015/how-to-get-there/,Historical Simhastha parking reference; validate against final 2027 traffic notification.
+Chincholi,Outer parking,medium,historical 2015 reference,73.9094495,19.8975833,https://kumbhmela.com/nasik-kumbh-2015/how-to-get-there/,Historical Simhastha parking reference; validate against final 2027 traffic notification.
+Khambale,Outer parking,medium,historical 2015 reference,73.632102,19.9548411,https://kumbhmela.com/nasik-kumbh-2015/how-to-get-there/,Historical Simhastha parking reference; validate against final 2027 traffic notification.
+Pahine,Outer parking,medium,historical 2015 reference,73.5527429,19.8993936,https://kumbhmela.com/nasik-kumbh-2015/how-to-get-there/,Historical Simhastha parking reference; validate against final 2027 traffic notification.
+Talwade,Outer parking,medium,historical 2015 reference,73.5553417,19.9736973,https://kumbhmela.com/nasik-kumbh-2015/how-to-get-there/,Historical Simhastha parking reference; validate against final 2027 traffic notification.
+Mahamarg Bus Stand,Transfer node,medium,historical 2015 reference,73.7829469,19.9888004,https://kumbhmela.com/nasik-kumbh-2015/how-to-get-there/,Historical inner bus stand / shuttle transfer node.
+Satpur Bus Stand,Transfer node,medium,historical 2015 reference,73.7319231,19.9912276,https://kumbhmela.com/nasik-kumbh-2015/how-to-get-there/,Historical inner bus stand / shuttle transfer node.
+Sharad Chandra Pawar Market,Transfer node,medium,historical 2015 reference,73.7905,20.0185,https://kumbhmela.com/nasik-kumbh-2015/how-to-get-there/,Historical inner bus stand / shuttle transfer node.
+Nilgiri Baug,Transfer node,medium,historical 2015 reference,73.8176,20.0132,https://kumbhmela.com/nasik-kumbh-2015/how-to-get-there/,Historical inner bus stand / shuttle transfer node.
+Lakshmi Narayan Trust Hanuman Nagar,Transfer node,medium,historical 2015 reference,73.8038,20.0224,https://kumbhmela.com/nasik-kumbh-2015/how-to-get-there/,Historical inner bus stand / shuttle transfer node.
+Sinnar Bypass Market Yard,Transfer node,medium,historical 2015 reference,73.858,19.932,https://kumbhmela.com/nasik-kumbh-2015/how-to-get-there/,Historical inner bus stand / shuttle transfer node.
+Brahma Valley,Transfer node,medium,historical 2015 reference,73.574,19.9264,https://kumbhmela.com/nasik-kumbh-2015/how-to-get-there/,Historical inner bus stand / shuttle transfer node.
+Pegalwadi,Transfer node,medium,historical 2015 reference,73.5537531,19.9393065,https://kumbhmela.com/nasik-kumbh-2015/how-to-get-there/,Historical inner bus stand / shuttle transfer node.
+Peth Road parking belt,Parking belt,high,under joint survey,73.7775,20.0305,https://www.freepressjournal.in/pune/nashik-simhastha-2027-ntkma-orders-joint-survey-of-parking-sites,"Large parking parcel belt under NMC/PWD/NTKMA physical verification; use as search area, not a final point."
+Dindori Road parking belt,Parking belt,high,under joint survey,73.8032903,20.0344735,https://www.freepressjournal.in/pune/nashik-simhastha-2027-ntkma-orders-joint-survey-of-parking-sites,"Large parking parcel belt under NMC/PWD/NTKMA physical verification; use as search area, not a final point."
+Dhule Road parking belt,Parking belt,high,under joint survey,73.833,20.04,https://www.freepressjournal.in/pune/nashik-simhastha-2027-ntkma-orders-joint-survey-of-parking-sites,"Large parking parcel belt under NMC/PWD/NTKMA physical verification; use as search area, not a final point."
+Pune Road parking belt,Parking belt,high,under joint survey,73.8592833,18.7572012,https://www.freepressjournal.in/pune/nashik-simhastha-2027-ntkma-orders-joint-survey-of-parking-sites,"Large parking parcel belt under NMC/PWD/NTKMA physical verification; use as search area, not a final point."
+Mumbai Road parking belt,Parking belt,high,under joint survey,73.8638745,20.0361024,https://www.freepressjournal.in/pune/nashik-simhastha-2027-ntkma-orders-joint-survey-of-parking-sites,"Large parking parcel belt under NMC/PWD/NTKMA physical verification; use as search area, not a final point."

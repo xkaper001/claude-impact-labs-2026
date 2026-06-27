@@ -48,18 +48,39 @@ Use to find which zones have camera coverage near any reported location.
 ---
 
 #### 3. `Zone_Boundaries.csv`
-The **32 administrative zones** across the grounds.
+The **32 CCTV administrative zones** across the grounds. Use centroids for fast zone lookup and scoring; use `Area_Boundaries.geojson` when you need the actual polygon.
 
 | Field | Description |
 |---|---|
-| zone_name | Zone label |
-| centroid_lat | Approximate center latitude |
-| centroid_lng | Approximate center longitude |
-| approx_boundary_points | Boundary polygon point count |
+| zone_name | Zone label (e.g. `Zone Area 1`) |
+| area_type | Always `cctv_zone` |
+| centroid_lat | Center latitude (derived from polygon) |
+| centroid_lng | Center longitude (derived from polygon) |
+| boundary_point_count | Polygon vertex count |
 
 ---
 
-#### 4. `Police_Stations.csv`
+#### 4. `Area_Boundaries.geojson`
+**53 boundary polygons** extracted from the CCTV map: the 32 CCTV zones plus **21 sacred/transit sub-areas** (ghats, Ram Kund, railway station, CBS hub, etc.). Load in Leaflet/Mapbox for zone overlays, point-in-polygon checks, and resolving vague landmarks ("near Ramkund") to a zone.
+
+Each feature has: `name`, `area_type` (`cctv_zone` or `special_area`), `subtype` (`cctv_zone` / `ghat` / `transit_hub` / `landmark`), `centroid_lat`, `centroid_lng`, `boundary_point_count`.
+
+---
+
+#### 5. `Special_Areas.csv`
+Quick lookup table for the **21 non-zone polygons** (ghats, kunds, transit hubs) also present in `Area_Boundaries.geojson`.
+
+| Field | Description |
+|---|---|
+| area_name | Named area (e.g. `Ram Kund`, `Nashik Road Railway Station`) |
+| subtype | `ghat`, `transit_hub`, or `landmark` |
+| centroid_lat | Center latitude |
+| centroid_lng | Center longitude |
+| boundary_point_count | Polygon vertex count |
+
+---
+
+#### 6. `Police_Stations.csv`
 **14 police stations** across Nashik serving the mela area. Real locations.
 
 | Field | Description |
@@ -72,17 +93,21 @@ Use to route a found person or family to the nearest help point, or to model res
 
 ---
 
-#### 5. `Chokepoints_Parking.csv`
-**85 mapped points** across the mela: traffic chokepoints, transfer nodes and parking zones. Real locations.
+#### 7. `Chokepoints_Parking.csv`
+**85 mapped points** across the mela: traffic chokepoints, transfer nodes and parking zones. Real locations with crowd-risk metadata.
 
 | Field | Description |
 |---|---|
 | location_name | Name of the point |
 | category | Traffic choke point / No-vehicle pressure zone / Transfer node / Parking / Outer parking / Parking belt |
+| risk_level | Crowd/separation risk: `very high`, `high`, or `medium` |
+| status | Planning status (e.g. `confirmed 2027 project`, `confirmed Kumbh pressure zone`) |
 | longitude | GPS longitude |
 | latitude | GPS latitude |
+| source_url | Reference URL for the location/risk assessment |
+| note | Plain-language context for operators and ICCC |
 
-Breakdown: 26 traffic chokepoints, 11 transfer nodes, 3 no-vehicle pressure zones, 30 parking, 10 outer parking, 5 parking belts. These are exactly where crowd density peaks and separations are most likely, useful for predicting hotspots and placing help points.
+Breakdown: 26 traffic chokepoints, 11 transfer nodes, 3 no-vehicle pressure zones, 30 parking, 10 outer parking, 5 parking belts. **6 very-high-risk** points (Dwarka corridor, Ramkund zone, railway station, etc.). Use `risk_level` to prioritize Mode C hotspot alerts and chokepoint-aware match confidence.
 
 ---
 
@@ -107,6 +132,7 @@ Breakdown: 26 traffic chokepoints, 11 transfer nodes, 3 no-vehicle pressure zone
 
 ### Data Credits
 CCTV, police station, chokepoint and parking location data provided by Kumbhathon Innovation Foundation.
+Zone polygons and chokepoint risk metadata were extracted from source KML maps into `Area_Boundaries.geojson` and enriched CSV columns.
 Synthetic missing-person dataset generated for Claude Impact Lab, Mumbai 2026.
 All missing-person records are fake. No real personal data is present in any file.
 

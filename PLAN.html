@@ -408,7 +408,7 @@
       <ul class="clean">
         <li><b>Phonetic / fuzzy name</b> (Soundex-style + edit distance) so <i>Ram, Raam, Rama</i> collapse together; skipped gracefully when blank.</li>
         <li><b>Hard filters</b> gender + age-band overlap — cheap, cuts the pool fast.</li>
-        <li><b>Spatio-temporal plausibility</b> last-seen zone vs found zone, walkable in the time gap (we have all 32 zone centroids + chokepoints).</li>
+        <li><b>Spatio-temporal plausibility</b> last-seen zone vs found zone, walkable in the time gap (32 zone centroids + <code>Area_Boundaries.geojson</code> polygons + 21 ghat/transit sub-areas for landmark resolution).</li>
         <li><b>Description embedding</b> "white clothes / grey hair / asking for Ramkund" matched semantically with a pre-trained multilingual model — <i>not</i> trained from scratch, per the brief.</li>
         <li><b>Duplicate detection</b> same logic flags the 8% of records that are the same person across centers, cleaning the registry as it grows.</li>
       </ul>
@@ -468,7 +468,7 @@
         <ul class="clean">
           <li><b>Field weights</b> — age, gender, state, description, location, time, name point values.</li>
           <li><b>Confidence bands</b> — HIGH / MEDIUM / LOW cutoffs + the minimum score to return.</li>
-          <li><b>Cluster rules</b> — open-cases threshold &amp; radius that mark a chokepoint zone "danger" (Mode C).</li>
+          <li><b>Cluster rules</b> — open-cases threshold &amp; radius that mark a chokepoint zone "danger" (Mode C); tie-break by <code>risk_level</code>.</li>
           <li><b>Escalation rules</b> — child age ceiling, hours-open trigger, duplicate-count trigger.</li>
           <li><b>Adjacency</b> — which age-bands and zones count as "adjacent" for partial credit.</li>
         </ul>
@@ -541,7 +541,7 @@
         <div class="tl-body">
           <div class="tl-who who-a">A — Data + Matcher</div>
           <h4>Load CSVs, build the config-driven scorer</h4>
-          <p>Ingest 2,500 records + zones + chokepoints into CouchDB. Build the <b>rules engine</b> that reads <code>config:scoring</code> (weights/bands/adjacency) — name-phonetic + age/gender + zone-time plausibility. Wrap Claude behind <code>LlmBackend</code> for the semantic-description points. Validate it finds the 8% known dupes.</p>
+          <p>Ingest 2,500 records + zones + <code>Area_Boundaries.geojson</code> + chokepoints (with <code>risk_level</code>) into CouchDB. Build the <b>rules engine</b> that reads <code>config:scoring</code> (weights/bands/adjacency) — name-phonetic + age/gender + zone-time plausibility. Wrap Claude behind <code>LlmBackend</code> for the semantic-description points. Validate it finds the 8% known dupes.</p>
         </div>
       </div>
       <div class="tl-block">
@@ -557,7 +557,7 @@
         <div class="tl-body">
           <div class="tl-who who-c">C — Map + Glue</div>
           <h4>Ops map + sync layer</h4>
-          <p>Leaflet map of 32 zones (centroids), 1,280 CCTV, chokepoints (26 traffic = triangles), 14 police stations. Open-case dots + cluster heatmap. <b>PouchDB↔CouchDB live replication</b> across the two tabs. Nearest-police routing.</p>
+          <p>Leaflet map: 32 zone polygons from GeoJSON, 1,280 CCTV, chokepoints sized/colored by <code>risk_level</code> (26 traffic = triangles), 14 police stations. Open-case dots + cluster heatmap. <b>PouchDB↔CouchDB live replication</b> across the two tabs. Nearest-police routing; point-in-polygon for vague last-seen text.</p>
         </div>
       </div>
       <div class="tl-block">
@@ -619,7 +619,7 @@
   </section>
 
   <div class="footer">
-    Setu · Claude Impact Lab Mumbai 2026 · plan built on the provided synthetic dataset (2,500 records, 1,280 cameras, 32 zones, 14 police stations, 85 chokepoints). All missing-person data is fake.
+    Setu · Claude Impact Lab Mumbai 2026 · plan built on the provided synthetic dataset (2,500 records, 1,280 cameras, 32 zone polygons + 21 ghat/transit areas, 14 police stations, 85 chokepoints with risk metadata). All missing-person data is fake.
     <br>Jump to: <a class="jump" href="#problem">problem</a> · <a class="jump" href="#build">build</a> · <a class="jump" href="#demo">demo</a> · <a class="jump" href="#system">system</a> · <a class="jump" href="#config">config</a> · <a class="jump" href="#privacy">privacy</a> · <a class="jump" href="#timeline">5-hour plan</a> · <a class="jump" href="#criteria">rubric</a> · <a class="jump" href="#decided">decisions</a>
   </div>
 

@@ -1,0 +1,22 @@
+area_name,subtype,centroid_lat,centroid_lng,boundary_point_count
+CBS Main Local Transit Hub,transit_hub,20.001114,73.783147,3
+Dasak Ghat,ghat,19.989967,73.846416,5
+Dwarka Circle,landmark,19.994099,73.796924,11
+Gandhi Talav,landmark,20.00784,73.791458,9
+Gandhi Talav 2,landmark,20.007491,73.790965,5
+Ganga Ghat,ghat,20.007455,73.792197,4
+Ganga Ghat 2,ghat,20.007402,73.792571,4
+Gharpure Ghat,ghat,20.008973,73.783853,6
+Goda Ghat,ghat,20.007707,73.792187,4
+Goda Ghat 2,ghat,20.007731,73.792525,6
+Nashik Road Railway Station,transit_hub,19.948289,73.841376,4
+Panchavati Karanja,landmark,20.010095,73.794873,11
+Ram Kund,ghat,20.008191,73.792395,46
+Rokdoba Maidan Ghat,ghat,20.004804,73.792946,6
+Rokdoba Maidan Ghat 1,ghat,20.004894,73.793547,4
+Shalimar Chowk,transit_hub,20.000259,73.786528,3
+Sita Kund 1,ghat,20.007906,73.792233,7
+Sita Kund 2,ghat,20.007925,73.792468,4
+Takli Sangam Ghat,ghat,19.989651,73.821641,5
+Talkuteshwar Ghat,ghat,20.001328,73.799415,5
+Thakkar Bazar,transit_hub,19.999319,73.780873,4

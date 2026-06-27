@@ -36,7 +36,8 @@
     "minOpenCases": 3,
     "radiusMeters": 300,
     "trafficChokepointsOnly": true,
-    "_note": "Mode C HOTSPOT: a zone with >= minOpenCases open cases within radiusMeters of a Traffic-choke-point = HIGH danger. Surfaced top-5 for the ICCC map."
+    "riskPriority": ["very high", "high", "medium"],
+    "_note": "Mode C HOTSPOT: a zone with >= minOpenCases open cases within radiusMeters of a Traffic-choke-point = HIGH danger. When clusters tie, prefer the nearest chokepoint with higher risk_level (see riskPriority). Surfaced top-5 for the ICCC map."
   },
 
   "escalation": {
