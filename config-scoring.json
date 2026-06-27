@@ -1,0 +1,64 @@
+{
+  "_id": "config:scoring",
+  "version": 3,
+  "description": "Single source of truth for all AI matching behavior. Replicated to every console via PouchDB/CouchDB. Both the offline rules engine and the online LLM read from this doc, so they never drift. Edit here, applies everywhere, no redeploy.",
+
+  "weights": {
+    "age": 25,
+    "gender": 20,
+    "state": 20,
+    "description": 20,
+    "location": 10,
+    "time": 5,
+    "nameExact": 10,
+    "namePhonetic": 5
+  },
+  "scoreCap": 100,
+
+  "bands": {
+    "high": 75,
+    "medium": 50,
+    "low": 30
+  },
+
+  "timeWindowHours": 6,
+
+  "adjacency": {
+    "ageBands": [
+      ["41-60", "61-70"],
+      ["61-70", "71-80"],
+      ["71-80", "80+"]
+    ],
+    "_note": "Adjacent age bands earn partial age credit. Same band = full age weight; adjacent = half (engine rounds down)."
+  },
+
+  "cluster": {
+    "minOpenCases": 3,
+    "radiusMeters": 300,
+    "trafficChokepointsOnly": true,
+    "_note": "Mode C HOTSPOT: a zone with >= minOpenCases open cases within radiusMeters of a Traffic-choke-point = HIGH danger. Surfaced top-5 for the ICCC map."
+  },
+
+  "escalation": {
+    "childAgeMax": 12,
+    "childHours": 2,
+    "unresolvedHours": 6,
+    "dupReports": 3,
+    "_note": "Auto-flag for police: child < childAgeMax separated > childHours; UNRESOLVED case older than unresolvedHours; >= dupReports matching the same found person (trafficking concern)."
+  },
+
+  "returnRules": {
+    "topN": 3,
+    "topNHotspots": 5,
+    "minReturnScore": 30,
+    "_note": "Never return a match below minReturnScore. Modes A/B return topN; Mode C returns topNHotspots."
+  },
+
+  "llm": {
+    "backend": "claude",
+    "model": "claude-opus-4-8",
+    "useFor": ["transcribe", "translate", "structure", "semanticDescription", "explain", "duplicateDetection"],
+    "languages": ["en", "hi", "mr"],
+    "_note": "Swappable. Set backend to 'local' in future to route the same calls through an on-box LLM with zero other changes. When unreachable (offline), the rules engine scores everything except the 'description' (semantic) points and tags them 'semantic pending'."
+  }
+}
