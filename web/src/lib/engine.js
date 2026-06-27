@@ -68,7 +68,7 @@ export function locationVocab(data) {
   return [...set].sort((a, b) => a.localeCompare(b));
 }
 
-/** Map a Deepgram `submit_case` function-call payload to the engine query shape.
+/** Map a `submit_case` tool-call payload to the engine query shape.
  *  age_band (enum) feeds query.ageBands (engine/scoring.js supports it directly);
  *  age_approx is the numeric fallback. Blank strings become undefined so the
  *  engine's honesty rules treat them as unassessed, never as mismatches. */

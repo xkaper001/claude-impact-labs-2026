@@ -4,7 +4,10 @@ import { saveCase, audit, centerId } from '../lib/db.js';
 import { transcribe, complete } from '../lib/llm.js';
 import { recordAudio, stopRecorder } from '../lib/voice.js';
 import { locationVocab, submitCaseToQuery, ageBandFromApprox, buildStructurePrompt, parseStructureFields } from '../lib/engine.js';
-import { startVoiceAgent } from '../lib/voiceAgent.js';
+import { startVoiceAgent, VOICE_LANGS } from '../lib/voiceAgent.js';
+
+// UI language (en/hi/mr) → default pinned voice language (BCP-47).
+const UI_TO_BCP47 = { en: 'en-IN', hi: 'hi-IN', mr: 'mr-IN' };
 
 // Fallback list, used only before the dataset has synced in from CouchDB.
 const FALLBACK_LOCATIONS = [
@@ -47,6 +50,9 @@ export default function Intake({ tr, lang, mode, config, data, online, onBack, o
     reporter_mobile: '',
     reported_at: new Date().toISOString().slice(0, 16).replace('T', ' '),
   });
+  // Pinned conversation language. Defaults to the UI language so the session is
+  // single-language out of the box; 'auto' restores mirror-the-family behavior.
+  const [agentLang, setAgentLang] = useState(UI_TO_BCP47[lang] || 'hi-IN');
   const [recording, setRecording] = useState(false);
   const [busy, setBusy] = useState(false);
   const [sttNote, setSttNote] = useState('');
@@ -79,6 +85,7 @@ export default function Intake({ tr, lang, mode, config, data, online, onBack, o
     try {
       agentRef.current = await startVoiceAgent({
         mode,
+        lang: agentLang,
         voice: voiceCfg,
         voiceAgent: voiceAgentDoc,
         onEvent: (e) => {
@@ -125,7 +132,10 @@ export default function Intake({ tr, lang, mode, config, data, online, onBack, o
       setRecording(false);
       setBusy(true);
       const blob = await recPromise.current;
-      const out = await transcribe(blob, { language: lang });
+      // Pin description transcription to the chosen voice language too (ISO base,
+      // e.g. 'hi' from 'hi-IN'); 'auto' falls back to the UI language.
+      const sttLang = agentLang && agentLang !== 'auto' ? agentLang.split('-')[0] : lang;
+      const out = await transcribe(blob, { language: sttLang });
       setBusy(false);
       if (out.text) {
         setForm((f) => ({ ...f, physical_description: out.text }));
@@ -243,6 +253,16 @@ export default function Intake({ tr, lang, mode, config, data, online, onBack, o
 
       <div className="card card-pad">
         <p className="section-label">Talk to family (AI voice agent)</p>
+        <div className="field lang-pick">
+          <label>Conversation language</label>
+          <select
+            value={agentLang}
+            onChange={(e) => setAgentLang(e.target.value)}
+            disabled={!!agentRef.current}
+          >
+            {VOICE_LANGS.map((l) => <option key={l.code} value={l.code}>{l.label}</option>)}
+          </select>
+        </div>
         <div className="voice-bar">
           <button
             className={`btn rec-btn ${agentRef.current ? 'danger' : ''}`}

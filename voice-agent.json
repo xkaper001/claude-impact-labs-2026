@@ -1,7 +1,7 @@
 {
   "_id": "config:voiceAgent",
   "version": 1,
-  "description": "Setu Voice Intake — Deepgram Voice Agent config. Replicated to every console via PouchDB/CouchDB. The browser voiceAgent client reads this doc (falling back to bundled defaults if absent) and sends it as the agent think.prompt + think.functions. Edit here, applies everywhere, no redeploy.",
+  "description": "Setu Voice Intake — turn-based Google STT + Claude + Google TTS config. Replicated to every console via PouchDB/CouchDB. The browser voiceAgent client reads this doc (falling back to bundled defaults if absent) and sends systemPrompt + submitCase to /api/converse. Edit here, applies everywhere, no redeploy.",
 
   "greeting": "Namaste. I am here to help. Please tell me — did you lose someone, or did you find someone?",
 

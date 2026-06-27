@@ -518,6 +518,20 @@ button { font-family: inherit; }
   background: var(--surface-2); border: 1px solid var(--line); color: var(--ink-2);
 }
 
+.lang-pick { margin-bottom: 12px; max-width: 280px; }
+
+.intake-banner {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  font-size: 13px; font-weight: 600;
+  padding: 12px 14px; border-radius: var(--r);
+  margin-bottom: 16px; border: 1px solid var(--line);
+}
+.intake-banner svg { flex: 0 0 auto; }
+.intake-banner span { flex: 1 1 200px; }
+.intake-banner .btn { margin-left: auto; }
+.intake-banner.added { background: rgba(34,197,94,.10); border-color: rgba(34,197,94,.35); color: #15803d; }
+.intake-banner.related { background: rgba(234,179,8,.10); border-color: rgba(234,179,8,.40); color: #a16207; }
+
 .match {
   background: var(--surface);
   border: 1px solid var(--line);

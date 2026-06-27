@@ -39,6 +39,19 @@ async function complete(prompt, config, opts = {}) {
   return ClaudeBackend.complete(prompt, config, opts);
 }
 
+/** Multi-turn conversation (voice intake agent). Same backend seam as complete().
+ *  @param {Array}  messages  Anthropic messages array
+ *  @param {object} config    config:scoring doc
+ *  @param {object} opts      { system, tools, timeoutMs, maxTokens, fetchImpl }
+ *  @returns {Promise<{text:string, submitCase:object|null, messages:Array, pending:boolean}>}
+ */
+async function converse(messages, config, opts = {}) {
+  const llm = (config && config.llm) || {};
+  const backend = (llm.backend || 'claude').toLowerCase();
+  if (backend === 'local') return LocalBackend.converse(messages, config, opts);
+  return ClaudeBackend.converse(messages, config, opts);
+}
+
 const ClaudeBackend = {
   async complete(prompt, config, opts = {}) {
     const llm = config.llm || {};
@@ -73,6 +86,51 @@ const ClaudeBackend = {
     const text = (data.content && data.content[0] && data.content[0].text) || '';
     return { text, backend: 'claude', model, pending: false };
   },
+
+  // Multi-turn conversation for the voice intake agent. Unlike complete() (one
+  // prompt → one answer for the scoring path), this keeps a messages array and a
+  // system prompt, and offers the submit_case tool. Returns the assistant's
+  // spoken text plus, when present, the parsed submit_case input.
+  async converse(messages, config, opts = {}) {
+    const voiceThink = (config.voice && config.voice.think) || {};
+    const llm = config.llm || {};
+    const model = process.env.VOICE_MODEL || voiceThink.model || llm.model || 'claude-sonnet-4-6';
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      return { text: '', submitCase: null, messages, backend: 'claude', model, pending: true, reason: 'no_api_key' };
+    }
+    const fetchImpl = opts.fetchImpl || (typeof fetch !== 'undefined' ? fetch : null);
+    if (!fetchImpl) throw new Error('No fetch implementation available for ClaudeBackend');
+    const body = {
+      model,
+      max_tokens: opts.maxTokens || 800,
+      messages,
+    };
+    if (opts.system) body.system = opts.system;
+    if (opts.tools && opts.tools.length) body.tools = opts.tools;
+    const res = await fetchImpl(ANTHROPIC_URL, {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': ANTHROPIC_VERSION,
+      },
+      body: JSON.stringify(body),
+      signal: opts.timeoutMs ? AbortSignal.timeout(opts.timeoutMs) : undefined,
+    });
+    if (!res.ok) {
+      const errBody = await res.text().catch(() => '');
+      return { text: '', submitCase: null, messages, backend: 'claude', model, pending: true, reason: `http_${res.status}`, body: errBody };
+    }
+    const data = await res.json();
+    const content = Array.isArray(data.content) ? data.content : [];
+    const text = content.filter((b) => b.type === 'text').map((b) => b.text).join(' ').trim();
+    const toolUse = content.find((b) => b.type === 'tool_use' && b.name === 'submit_case');
+    const submitCase = toolUse ? toolUse.input || {} : null;
+    // Echo the assistant turn back so the caller maintains conversation state.
+    const nextMessages = [...messages, { role: 'assistant', content }];
+    return { text, submitCase, messages: nextMessages, backend: 'claude', model, pending: false };
+  },
 };
 
 /** Stub for the future on-box LLM. Returns pending so the engine keeps scoring
@@ -83,6 +141,10 @@ const LocalBackend = {
     const llm = config.llm || {};
     return { text: '', backend: 'local', model: llm.model || 'local', pending: true, reason: 'local_not_configured' };
   },
+  async converse(messages, config, _opts = {}) {
+    const llm = config.llm || {};
+    return { text: '', submitCase: null, messages, backend: 'local', model: llm.model || 'local', pending: true, reason: 'local_not_configured' };
+  },
 };
 
-module.exports = { complete, CAPABILITIES, ClaudeBackend, LocalBackend };
+module.exports = { complete, converse, CAPABILITIES, ClaudeBackend, LocalBackend };

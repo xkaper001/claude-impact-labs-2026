@@ -14,7 +14,7 @@
 //                        ref:specialAreas / ref:locationCoords → { rows: [...] }
 //                        ref:areaBoundaries                     → { geojson: {...} }
 //   kind: "config"   — config:scoring (scoring weights), config:prompts ({text}),
-//                        config:voiceAgent (Deepgram intake prompt + submit_case schema)
+//                        config:voiceAgent (voice intake prompt + submit_case schema)
 //   kind: "audit"    — append-only audit events (create/match/escalate/purge)
 //
 // The PWA ships with NO bundled data. CouchDB is populated externally (ops/admin)

@@ -1,8 +1,3 @@
 {
-  "mcpServers": {
-    "deepgram-docs": {
-      "type": "http",
-      "url": "https://api.dx.deepgram.com/kapa/mcp"
-    }
-  }
+  "mcpServers": {}
 }
