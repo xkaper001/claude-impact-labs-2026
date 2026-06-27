@@ -145,13 +145,16 @@ live in CouchDB without a redeploy.
 
 ## Data
 
-Provided synthetic dataset (`claude-impact-labs-data/.../data/`). All missing-person records are fake.
+Provided synthetic dataset (`claude-impact-labs-data/claude-impact-lab-mumbai-2026/data/`). All missing-person records are fake. Geography is real (Kumbhathon Innovation Foundation).
 
 | File | Rows | Use |
 |---|---|---|
 | `Synthetic_Missing_Persons_2500.csv` | 2,500 | the registry — messy, realistic reports |
-| `Zone_Boundaries.csv` | 32 | zone centroids for map dots / spatial scoring |
-| `Chokepoints_Parking.csv` | 85 | 26 traffic chokepoints = danger triangles on the map |
+| `Area_Boundaries.geojson` | 53 polygons | 32 zone polygons + 21 ghat/transit sub-areas — map overlays & landmark→zone resolution |
+| `Zone_Boundaries.csv` | 32 | zone centroids + polygon-derived metadata for spatial scoring |
+| `Special_Areas.csv` | 21 | ghats / kunds / transit hubs — resolve "near Ramkund" to a zone |
+| `Location_Coordinates.csv` | 20 | curated coords for every `last_seen_location` term |
+| `Chokepoints_Parking.csv` | 85 | 26 traffic chokepoints + transfer nodes + parking; **risk_level** (very high/high/medium), status, source, note |
 | `CCTV_Locations.csv` | 1,280 | coverage map across 32 zones |
 | `Police_Stations.csv` | 14 | routing / escalation |
 
@@ -162,27 +165,72 @@ Provided synthetic dataset (`claude-impact-labs-data/.../data/`). All missing-pe
 | File | What |
 |---|---|
 | `PLAN.html` | Interactive pitch & build plan (open in a browser) |
+| `progress.md` | Build status — what's done ✅, partial 🟡, planned ⬜ |
 | `config-scoring.json` | The CouchDB `config:scoring` doc — all tunable AI behavior |
 | `prompts.md` | All system prompts, phased and config-driven (P1 → P2 → P3) |
+| `engine/` | The deterministic core — runs today (see below) |
+| `web/` | PWA console — React+Vite, PouchDB↔CouchDB, Leaflet ops map, LlmBackend proxy (`web/DESIGN.md`) |
 | `README.md` | This file |
+
+### Built today — the deterministic core (`engine/`)
+
+Zero-dependency JS rules engine + Claude prompt builder. Same code runs in Node (CLI) and in the browser under PouchDB. **Validated**, not slideware:
+
+```bash
+npm run validate   # planted-twin accuracy harness
+npm run demo       # Mode A/B cross-center search
+npm run hotspot    # Mode C ICCC hotspot sweep
+npm run prompt     # emit the Claude prompt with candidates+config injected
+```
+
+- **Mode A/B matcher** — config-driven scoring, honest per-field breakdown, pre-filter to ≤40 candidates. Mode B (`--mode B`) is the IDENTIFY variant. Planted-twin harness: **91.7% cross-center recall (top-3), 80.3% #1, 83.3% at HIGH band** — fully offline, family-known fields only.
+- **Mode C hotspot** — clusters open cases near Traffic choke-points; ranks by case count then `risk_level` (very high > high > medium); names the nearest police station. 277/277 open cases geo-resolve to a real zone.
+- **Phase 3 guardrails** — chokepoint-awareness annotation on every match, nearest-police-station in escalation messages, `dupReports` trafficking-sensitive trigger (union-find over the candidate pool), and offline landmark resolution (`--resolve "near Ramkund"` → zone).
+- **Landmark resolution** — `geo.js` + curated coords resolve every `last_seen_location` to a real point and feed adjacent-zone scoring.
+
+What's **planned** (see `progress.md`): code-split the map chunk, point-in-polygon last-seen, photo capture + purge, auth gate, and the local-LLM adapter. The PWA console, CouchDB sync, Leaflet ops map, and LlmBackend are **scaffolded in `web/`** (build-verified).
 
 ---
 
 ## Running the demo
 
-**1. Start the sync hub (local, offline-capable):**
+**A. Run the engine now (zero setup, no network):**
+```bash
+npm run validate                                      # accuracy harness
+npm run demo                                          # Mode A/B search
+npm run hotspot                                       # Mode C ICCC sweep
+node engine/cli.js --mode B ...                       # Mode B IDENTIFY
+node engine/cli.js --resolve "near Ramkund"           # offline landmark → zone
+node engine/cli.js --hotspot --now "2027-08-12 18:00" # → top danger zones
+```
+The engine is the validated core — scoring, dedup/re-report flags, escalation, and Mode C all run offline from `config-scoring.json`.
+
+**B. Full sync demo (Phase-2 frontend build — now scaffolded in `web/`):**
+```bash
+cd web && cp .env.example .env     # set ANTHROPIC_API_KEY, WHISPER_BOX_URL, COUCHDB_URL
+npm install && npm start           # Vite (5173) + API proxy (8787)
+# CouchDB for the 2-center sync:
+docker run -d -p 5984:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=admin couchdb:3
+```
+The console is a React+Vite **PWA**: PouchDB in the browser ↔ CouchDB multi-master
+replication, the **same `engine/`** scoring/hotspot code running in-browser, a
+Leaflet/OpenStreetMap ops map (`Area_Boundaries.geojson` polygons, risk-colored
+chokepoints, hotspot heat-circles), and voice intake (Whisper.cpp box offline +
+Web Speech online + typed fallback). The `LlmBackend` (`engine/llm.js`,
+Claude now / local later) is called via a server proxy so the API key never
+reaches the browser; offline, the rules engine still scores and the UI shows
+"semantic pending". Full design + contracts: **`web/DESIGN.md`**.
+
+1. Start the sync hub (local, offline-capable):
 ```bash
 docker run -d -p 5984:5984 -e COUCHDB_USER=admin -e COUCHDB_PASSWORD=admin couchdb:3
 ```
-
-**2. Seed the config + data** into CouchDB (load `config-scoring.json` as a doc; import the CSVs).
-
-**3. Run the console** (two named databases — `center1`, `center2` — both replicating to
-`http://localhost:5984`) so the demo shows the real cross-center gap closing, not two tabs sharing
-one store.
-
-**4. Demo offline:** pull the network cable → consoles keep scoring (rules engine) → re-enable →
-records converge across both centers. That is the offline + sync proof.
+2. Seed the config + data into CouchDB (load `config-scoring.json` as a doc; import the CSVs).
+3. Run the console (two named databases — `center1`, `center2` — both replicating to
+   `http://localhost:5984`) so the demo shows the real cross-center gap closing, not two tabs sharing
+   one store.
+4. Demo offline: pull the network cable → consoles keep scoring (rules engine) → re-enable → records
+   converge across both centers. That is the offline + sync proof.
 
 ### Three demo scenarios
 
@@ -192,9 +240,10 @@ records converge across both centers. That is the offline + sync proof.
 2. **Offline + dedup.** Network OFF, log a found child at Center 1. Family already reported the same
    child at Center 7. Re-enable → sync → Setu flags the duplicate/re-report and auto-escalates (child
    < 12, > 2h) with the nearest police station. *"Messy, offline, duplicated — handled."*
-3. **Hotspot sweep (ICCC).** Run spike load → Setu returns top danger zones: *"🔺 Zone 8 — 4 open
-   cases, 180m from Traffic Chokepoint Dwarka Circle."* *"Same data predicts the crush — plugs into
-   the government control room."*
+3. **Hotspot sweep (ICCC).** Run spike load → Setu returns top danger zones, ranked by case count
+   then chokepoint risk: *"🔺 Zone Area 31 — 14 open cases, 167m from Mumbai Naka (high) → nearest
+   help Mumbai naka PS (194m)."* *"Same data predicts the crush — plugs into the government control
+   room."*
 
 Order on stage: **1 (emotional hook) → 2 (technical credibility) → 3 (scale / government vision).**
 

@@ -1,0 +1,30 @@
+{
+  "name": "kumbhrakshak-console",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Offline-first PWA console for Setu — Lost/Found intake, cross-center matching, ICCC ops map.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "server": "node server/index.js",
+    "start": "concurrently -k -n web,api \"vite\" \"node server/index.js\""
+  },
+  "dependencies": {
+    "events": "^3.3.0",
+    "leaflet": "^1.9.4",
+    "pouchdb-browser": "^9.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-leaflet": "^4.2.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.1",
+    "concurrently": "^9.0.1",
+    "express": "^4.19.2",
+    "multer": "^1.4.5-lts.1",
+    "vite": "^5.4.0",
+    "vite-plugin-pwa": "^0.20.0"
+  }
+}

@@ -20,8 +20,17 @@ function loadRecords() { return loadCSV('Synthetic_Missing_Persons_2500.csv'); }
 function loadZones() { return loadCSV('Zone_Boundaries.csv'); }
 function loadChokepoints() { return loadCSV('Chokepoints_Parking.csv'); }
 function loadPoliceStations() { return loadCSV('Police_Stations.csv'); }
+function loadCCTV() { return loadCSV('CCTV_Locations.csv'); }
+function loadSpecialAreas() { return loadCSV('Special_Areas.csv'); }
+function loadLocationCoords() { return loadCSV('Location_Coordinates.csv'); }
+
+function loadAreaBoundaries() {
+  const text = fs.readFileSync(path.join(DATA_DIR, 'Area_Boundaries.geojson'), 'utf8');
+  return JSON.parse(text);
+}
 
 module.exports = {
   ROOT, DATA_DIR,
   loadConfig, loadRecords, loadZones, loadChokepoints, loadPoliceStations,
+  loadCCTV, loadSpecialAreas, loadLocationCoords, loadAreaBoundaries,
 };

@@ -1,0 +1,13 @@
+{
+  "name": "kumbhrakshak-setu",
+  "version": "0.3.0",
+  "private": true,
+  "description": "Offline-first cross-center missing-person matcher for Nashik Kumbh Mela 2027. Zero-dependency rules engine + phased Claude prompt.",
+  "scripts": {
+    "validate": "node engine/validate.js",
+  "demo": "node engine/cli.js --gender Male --age 72 --state Bihar --loc \"Ramkund Ghat\" --desc \"elderly man, white kurta, rudraksha mala\" --semantic heuristic",
+  "prompt": "node engine/cli.js --gender Male --age 72 --state Bihar --loc \"Ramkund Ghat\" --prompt 2",
+  "hotspot": "node engine/cli.js --hotspot --now \"2027-08-12 18:00\""
+  },
+  "license": "MIT"
+}

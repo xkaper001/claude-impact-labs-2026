@@ -557,7 +557,7 @@
         <div class="tl-body">
           <div class="tl-who who-c">C — Map + Glue</div>
           <h4>Ops map + sync layer</h4>
-          <p>Leaflet map: 32 zone polygons from GeoJSON, 1,280 CCTV, chokepoints sized/colored by <code>risk_level</code> (26 traffic = triangles), 14 police stations. Open-case dots + cluster heatmap. <b>PouchDB↔CouchDB live replication</b> across the two tabs. Nearest-police routing; point-in-polygon for vague last-seen text.</p>
+          <p>Leaflet map: 32 zone polygons from <code>Area_Boundaries.geojson</code>, 1,280 CCTV, chokepoints sized/colored by <code>risk_level</code> (26 traffic = triangles), 14 police stations. Open-case dots + cluster heatmap fed by the <b>Mode C hotspot engine</b> (<code>engine/hotspot.js</code>, already built: clusters open cases near Traffic choke-points, risk-priority tie-break, nearest police station). <b>PouchDB↔CouchDB live replication</b> across the two tabs. Nearest-police routing; point-in-polygon for vague last-seen text via <code>geo.resolveLocation</code> + curated <code>Location_Coordinates.csv</code>.</p>
         </div>
       </div>
       <div class="tl-block">

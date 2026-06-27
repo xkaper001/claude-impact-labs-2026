@@ -93,7 +93,20 @@ Use to route a found person or family to the nearest help point, or to model res
 
 ---
 
-#### 7. `Chokepoints_Parking.csv`
+#### 7. `Location_Coordinates.csv`
+Curated GPS coordinates for the **20 `last_seen_location` vocabulary terms** used in the missing-persons dataset. Lets the matcher and Mode C resolve every case to a real point on the map (several terms aren't in `Special_Areas.csv`).
+
+| Field | Description |
+|---|---|
+| location_name | Vocabulary term (e.g. `Ramkund Ghat`, `Sadhugram Gate 1`) |
+| longitude | GPS longitude |
+| latitude | GPS latitude |
+| source | Provenance note (e.g. `curated (Ram Kund)`) |
+
+---
+
+#### 8. `Chokepoints_Parking.csv`
+
 **85 mapped points** across the mela: traffic chokepoints, transfer nodes and parking zones. Real locations with crowd-risk metadata.
 
 | Field | Description |

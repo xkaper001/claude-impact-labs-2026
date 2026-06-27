@@ -27,6 +27,7 @@
 const data = require('./data');
 const S = require('./scoring');
 const { search, preFilter } = require('./search');
+const geo = require('./geo');
 
 // Deterministic PRNG (no Math.random) so the harness is reproducible.
 function lcg(seed) {
@@ -97,6 +98,13 @@ function run() {
   const all = data.loadRecords();
   const rnd = lcg(20270728);
 
+  // Location adjacency from Special_Areas + zone centroids, so jittered
+  // last-seen locations (Ramkund Ghat <-> Panchavati Circle) still score.
+  const areas = geo.buildAreaIndex(data.loadSpecialAreas(), data.loadZones(), data.loadLocationCoords());
+  const vocab = [...new Set(all.map((r) => r.last_seen_location).filter(Boolean))];
+  const locationAdjacency = geo.buildLocationAdjacency(vocab, areas);
+  const opts = { locationAdjacency, areaIndex: areas, chokepoints: data.loadChokepoints(), policeStations: data.loadPoliceStations() };
+
   const N = 300;
   // Pick N distinct seed records spread across the dataset.
   const seeds = [];
@@ -113,8 +121,8 @@ function run() {
     const pool = all.filter((r) => r.case_id !== seed.case_id).concat([twin]);
 
     const q = familyQuery(seed);
-    prefilterMax = Math.max(prefilterMax, preFilter(q, pool, config).length);
-    const res = search(q, pool, config); // default semantic 'pending' (offline-safe)
+    prefilterMax = Math.max(prefilterMax, preFilter(q, pool, config, opts).length);
+    const res = search(q, pool, config, opts); // default semantic 'pending' (offline-safe)
 
     const rank = res.matches.findIndex((m) => m.record.case_id === twin.case_id);
     if (rank >= 0) {

@@ -8,12 +8,11 @@
  * hands that small set to Claude to fill the semantic `description` points
  * and write the operator-facing explanation. One source of truth for the
  * prompt text (prompts.md) and the numbers (config-scoring.json).
+ *
+ * fs-free: the prompts.md text is passed in via opts.md by the caller
+ * (Node CLI reads it from disk; the browser inlines it at build time via
+ * ?raw). So this same module runs unchanged in Node and in the browser.
  */
-
-const fs = require('fs');
-const path = require('path');
-
-const PROMPTS_MD = path.resolve(__dirname, '..', 'prompts.md');
 
 // Fields the prompt declares it will receive (project to avoid leaking the
 // reporter_mobile into prompt text — the NEVER block forbids repeating it).
@@ -34,9 +33,9 @@ function extractPhaseBlocks(md) {
 
 /** Assemble the full prompt text for a phase (1, 2, or 3). Phases are
  *  cumulative: phase N = phase 1 .. N concatenated, with the
- *  "[ALL OF PHASE ...]" marker lines stripped. */
+ *  "[ALL OF PHASE ...]" marker lines stripped. `md` is the prompts.md text. */
 function assemblePhase(phase = 1, md) {
-  md = md || fs.readFileSync(PROMPTS_MD, 'utf8');
+  if (!md) throw new Error('assemblePhase: prompts.md text is required (pass opts.md)');
   const blocks = extractPhaseBlocks(md);
   if (!blocks.length) throw new Error('No ```text prompt blocks found in prompts.md');
   const n = Math.min(phase, blocks.length);
@@ -66,7 +65,7 @@ function projectCandidates(records) {
  */
 function buildPrompt(candidates, config, opts = {}) {
   const phase = opts.phase || 1;
-  let prompt = assemblePhase(phase);
+  let prompt = assemblePhase(phase, opts.md);
   const candJSON = JSON.stringify(projectCandidates(candidates), null, 2);
   const configJSON = JSON.stringify(config, null, 2);
   prompt = prompt
@@ -75,4 +74,49 @@ function buildPrompt(candidates, config, opts = {}) {
   return prompt;
 }
 
-module.exports = { buildPrompt, assemblePhase, extractPhaseBlocks, projectCandidates, CANDIDATE_FIELDS };
+/** Build a Mode C (HOTSPOT) prompt: the phased prompt text + a deterministic
+ *  payload of open cases, zones, and risk-tagged chokepoints. The engine has
+ *  already computed the hotspots; Claude's job online is to write the ICCC
+ *  action prose, not to recompute clusters. */
+function buildHotspotPrompt(openCases, zones, chokepoints, hotspots, config, opts = {}) {
+  const phase = opts.phase || 2;
+  const prompt = assemblePhase(phase, opts.md);
+  const configJSON = JSON.stringify(config, null, 2);
+  const payload = JSON.stringify({
+    mode: 'C',
+    openCases: projectCandidates(openCases),
+    zones: zones.map((z) => ({
+      zone_name: z.zone_name,
+      centroid_lat: Number(z.centroid_lat),
+      centroid_lng: Number(z.centroid_lng),
+    })),
+    chokepoints: chokepoints.map((c) => ({
+      location_name: c.location_name,
+      category: c.category,
+      risk_level: c.risk_level,
+      latitude: Number(c.latitude),
+      longitude: Number(c.longitude),
+    })),
+    engineHotspots: hotspots,
+  }, null, 2);
+  const header =
+    'MODE C HOTSPOT — ICCC control room. The deterministic engine has already ' +
+    'clustered open cases near Traffic choke-points (see engineHotspots below). ' +
+    'Use those as authoritative; write the ICCC action prose per the output ' +
+    'format, tie-break by risk_level, and never invent coordinates.\n\n';
+  return (
+    prompt
+      .replace('{{CONFIG_JSON}}', configJSON)
+      .replace('{{CANDIDATES_JSON}}', '[] // Mode C: see MODE C payload below') +
+    '\n\n--- MODE C PAYLOAD ---\n' + header + payload + '\n'
+  );
+}
+
+module.exports = {
+  buildPrompt,
+  buildHotspotPrompt,
+  assemblePhase,
+  extractPhaseBlocks,
+  projectCandidates,
+  CANDIDATE_FIELDS,
+};

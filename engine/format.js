@@ -40,8 +40,9 @@ function conflicts(m) {
 function formatResult(result, config, opts = {}) {
   const ts = opts.timestamp || '';
   const lines = [];
+  const modeLabel = (result.mode === 'B') ? 'IDENTIFY RESULT' : 'SEARCH RESULT';
   lines.push('---');
-  lines.push(`SEARCH RESULT — ${ts}`);
+  lines.push(`${modeLabel} — ${ts}`);
   lines.push(`Query: ${describeQuery(result.query)}`);
   lines.push(`Records searched: ${result.recordsSearched} (pre-filtered to ${result.candidatesConsidered} candidates)`);
   if (result.semanticMode === 'pending') {
@@ -66,6 +67,9 @@ function formatResult(result, config, opts = {}) {
     lines.push(`Score breakdown: ${fmtBreakdown(m.breakdown)} = ${m.score}`);
     lines.push('Why it matches:');
     for (const w of whyMatches(m)) lines.push(`  • ${w}`);
+    if (m.chokepoint) {
+      lines.push(`  • last seen near Chokepoint "${m.chokepoint.name}" (${m.chokepoint.riskLevel} separation zone, ${m.chokepoint.distanceM}m) — raises confidence this is the same incident`);
+    }
     const c = conflicts(m);
     lines.push(`Possible conflict: ${c.length ? c.join('; ') : 'none material'}`);
     lines.push(`⟶ NEXT ACTION: call ${r.reporting_center}, ask for case ${r.case_id}; ` +
@@ -74,6 +78,9 @@ function formatResult(result, config, opts = {}) {
   });
 
   for (const w of result.warnings) lines.push(w.message);
+  for (const esc of result.escalations || []) {
+    for (const f of esc.flags) lines.push(`⚠️ ${esc.caseId}: ${f.message}`);
+  }
   lines.push('---');
   return lines.join('\n');
 }
@@ -101,4 +108,37 @@ function describeQuery(q) {
   return bits.join(', ') || '(no constraints given)';
 }
 
-module.exports = { formatResult, describeQuery };
+/** Render a Mode C HOTSPOT sweep in the exact Phase-2 template. */
+function formatHotspot(result, config, opts = {}) {
+  const ts = opts.timestamp || '';
+  const lines = [];
+  lines.push('---');
+  lines.push(`HOTSPOT SWEEP — ${ts} · Open cases: ${result.openCases}`);
+  if (result.unassignedCases > 0) {
+    lines.push(`(excluded ${result.unassignedCases} open cases whose last-seen location could not be geo-resolved)`);
+  }
+  lines.push('');
+
+  if (result.hotspots.length === 0) {
+    lines.push('NO HIGH-DANGER CLUSTERS');
+    lines.push(`No zone has >= ${result.config.minOpenCases} open cases within ${result.config.radiusMeters}m of a Traffic choke-point.`);
+    lines.push('⟶ ICCC ACTION: keep monitoring; re-run as new cases arrive.');
+    lines.push('---');
+    return lines.join('\n');
+  }
+
+  for (const h of result.hotspots) {
+    lines.push(`🔺 ZONE ${h.zone} — ${h.openCases} open cases, ${h.distanceM == null ? '?' : h.distanceM + 'm'} from Chokepoint "${h.chokepoint}" (${h.riskLevel})`);
+    const trend = `Trend: ${h.recentCases} cases in last ${h.trendWindowHours}h`;
+    const help = h.nearestPoliceStation
+      ? ` · Nearest help: ${h.nearestPoliceStation}${h.policeDistanceM == null ? '' : ' (' + h.policeDistanceM + 'm)'}`
+      : ' · Nearest help: (none mapped)';
+    lines.push('   ' + trend + help);
+    lines.push(`   ⟶ ICCC ACTION: push announcement to ${h.zone} PA, pre-position volunteers at ${h.chokepoint}, divert flow away from the choke-point.`);
+    lines.push('');
+  }
+  lines.push('---');
+  return lines.join('\n');
+}
+
+module.exports = { formatResult, describeQuery, formatHotspot };

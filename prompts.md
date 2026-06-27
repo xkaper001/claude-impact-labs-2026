@@ -76,6 +76,9 @@ THREE MODES:
   missing-persons reports. Weight heavily: state of origin (families almost always know this even
   when name is unclear), clothing at separation, age band. Same scoring config.
 - MODE C HOTSPOT: crowd-danger clustering for the control room (ICCC).
+  The deterministic engine (`engine/hotspot.js`) ALREADY clusters open cases
+  near Traffic choke-points and hands you the ranked `engineHotspots` — treat
+  those as authoritative; your job is the ICCC action prose, not re-clustering.
   INPUT: all OPEN cases (last_seen resolved to a zone) + zone list (zone_name, centroid_lat,
   centroid_lng) + chokepoints (location_name, category, risk_level, lat, lng). The "Traffic choke
   point" rows are the high-risk triangles; prefer `risk_level` very high > high > medium when

@@ -13,8 +13,53 @@
  */
 
 const S = require('./scoring');
+const geo = require('./geo');
 
 const OPEN_STATUSES = new Set(['pending', 'unresolved']);
+
+// ---------------------------------------------------------------------------
+// Geo helpers for Phase 3 (chokepoint awareness + nearest police station)
+// ---------------------------------------------------------------------------
+
+/** Resolve a record's last_seen_location to a coordinate via the area index. */
+function recordCoord(record, areaIndex) {
+  if (!areaIndex) return null;
+  const hit = geo.resolveLocation(record.last_seen_location, areaIndex);
+  return hit ? { lat: hit.lat, lng: hit.lng } : null;
+}
+
+/** Nearest chokepoint to a record within `radiusM`, any category.
+ *  Returns { name, riskLevel, distanceM } or null. */
+function nearestChokepoint(record, chokepoints, areaIndex, radiusM) {
+  const rc = recordCoord(record, areaIndex);
+  if (!rc || !chokepoints || !chokepoints.length) return null;
+  let best = null;
+  for (const c of chokepoints) {
+    const lat = Number(c.latitude);
+    const lng = Number(c.longitude);
+    if (!isFinite(lat) || !isFinite(lng)) continue;
+    const d = geo.haversine([rc.lng, rc.lat], [lng, lat]);
+    if (d <= radiusM && (!best || d < best.distanceM)) {
+      best = { name: c.location_name, riskLevel: S.norm(c.risk_level), distanceM: Math.round(d) };
+    }
+  }
+  return best;
+}
+
+/** Nearest police station to a record. Returns { name, distanceM } or null. */
+function nearestStation(record, policeStations, areaIndex) {
+  const rc = recordCoord(record, areaIndex);
+  if (!rc || !policeStations || !policeStations.length) return null;
+  let best = null;
+  for (const p of policeStations) {
+    const lat = Number(p.latitude);
+    const lng = Number(p.longitude);
+    if (!isFinite(lat) || !isFinite(lng)) continue;
+    const d = geo.haversine([rc.lng, rc.lat], [lng, lat]);
+    if (!best || d < best.distanceM) best = { name: p.station_name, distanceM: Math.round(d) };
+  }
+  return best;
+}
 
 // ---------------------------------------------------------------------------
 // Pre-filter
@@ -75,6 +120,7 @@ function preFilter(query, records, config, opts = {}) {
 // ---------------------------------------------------------------------------
 
 function search(query, records, config, opts = {}) {
+  const mode = (opts.mode || 'A').toUpperCase(); // 'A' | 'B'
   const candidates = preFilter(query, records, config, opts);
 
   const scored = candidates
@@ -85,9 +131,26 @@ function search(query, records, config, opts = {}) {
   const topN = config.returnRules.topN;
   const matches = scored.filter((m) => m.score >= minScore).slice(0, topN);
 
+  // Phase 3 — chokepoint awareness: annotate each returned match with the
+  // nearest high-risk separation point near its last_seen, if any.
+  const awarenessRadius = (config.cluster && config.cluster.radiusMeters) || 300;
+  const areaIndex = opts.areaIndex || null;
+  for (const m of matches) {
+    const cp = nearestChokepoint(m.record, opts.chokepoints, areaIndex, awarenessRadius);
+    if (cp) m.chokepoint = cp;
+  }
+
   const warnings = [];
-  // Duplicate detection among the returned matches.
-  for (const dup of findDuplicatePairs(matches.map((m) => m.record), config)) {
+  // Phase 2 — duplicate detection across the candidate pool (not just top-N),
+  // surfacing pairs that involve a returned match first, capped at 5.
+  const matchIds = new Set(matches.map((m) => m.record.case_id));
+  const poolPairs = findDuplicatePairs(candidates, config);
+  poolPairs.sort((a, b) => {
+    const ai = (matchIds.has(a.pair[0]) || matchIds.has(a.pair[1])) ? 0 : 1;
+    const bi = (matchIds.has(b.pair[0]) || matchIds.has(b.pair[1])) ? 0 : 1;
+    return ai - bi;
+  });
+  for (const dup of poolPairs.slice(0, 5)) {
     warnings.push({
       type: 'duplicate',
       caseIds: dup.pair,
@@ -95,6 +158,22 @@ function search(query, records, config, opts = {}) {
         `Check with both centers before proceeding.`,
     });
   }
+
+  // Phase 3 — trafficking-sensitive trigger: >= dupReports candidates that are
+  // all the same person, across centers. Noted sensitively, never a conclusion.
+  const dupThreshold = (config.escalation && config.escalation.dupReports) || 3;
+  for (const group of groupSamePerson(candidates, config)) {
+    if (group.length < dupThreshold) continue;
+    const ids = group.map((r) => r.case_id);
+    warnings.push({
+      type: 'trafficking',
+      caseIds: ids,
+      message: `⚠️ SENSITIVE — ${ids.length} reports (${ids.slice(0, 4).join(', ')}${ids.length > 4 ? '…' : ''}) ` +
+        `appear to describe the same person across centers. Note sensitively — possible trafficking concern. ` +
+        `Escalate to a senior volunteer / police, do not discuss with the family.`,
+    });
+  }
+
   // Re-report: does the query itself match an OPEN case already on file?
   for (const m of matches) {
     if (OPEN_STATUSES.has(S.norm(m.record.status)) && m.band !== 'BELOW' && m.score >= config.bands.medium) {
@@ -108,13 +187,23 @@ function search(query, records, config, opts = {}) {
     }
   }
 
+  // Police escalation flags (config.escalation) — surfaced per match, with the
+  // nearest police station named (Phase 3).
+  const escalations = [];
+  for (const m of matches) {
+    const flags = escalationFlags(m.record, config, opts);
+    if (flags.length) escalations.push({ caseId: m.record.case_id, flags });
+  }
+
   return {
+    mode,
     query,
     recordsSearched: records.length,
     candidatesConsidered: candidates.length,
     semanticMode: opts.semantic == null ? 'pending' : opts.semantic,
     matches,
     warnings,
+    escalations,
   };
 }
 
@@ -169,22 +258,51 @@ function findDuplicatePairs(records, config) {
   return pairs;
 }
 
+/** Union-find grouping of records that look like the same person, across
+ *  centers. Returns groups (arrays of records) of size > 1. Used for the
+ *  Phase 3 dupReports trafficking-sensitive trigger. */
+function groupSamePerson(records, config) {
+  const parent = records.map((_, i) => i);
+  const find = (i) => { while (parent[i] !== i) { parent[i] = parent[parent[i]]; i = parent[i]; } return i; };
+  const union = (a, b) => { parent[find(a)] = find(b); };
+  for (let i = 0; i < records.length; i++) {
+    for (let j = i + 1; j < records.length; j++) {
+      if (looksLikeSamePerson(records[i], records[j], config)) union(i, j);
+    }
+  }
+  const groups = {};
+  for (let i = 0; i < records.length; i++) {
+    const r = find(i);
+    (groups[r] = groups[r] || []).push(records[i]);
+  }
+  return Object.values(groups).filter((g) => g.length > 1);
+}
+
 // ---------------------------------------------------------------------------
 // Escalation flags (config.escalation) — Phase 3
 // ---------------------------------------------------------------------------
 
-function escalationFlags(record, config, now) {
+function escalationFlags(record, config, opts = {}) {
   const esc = config.escalation;
   const flags = [];
-  const hrs = hoursAgo(record.reported_at, now);
-  const isChild = ['0-12'].includes(record.age_band) ||
-    (record.age_band === '0-12');
+  const hrs = hoursAgo(record.reported_at, opts.now);
+  const isChild = record.age_band === '0-12' ||
+    (record.age_band === '13-17' && esc.childAgeMax != null && 13 <= Number(esc.childAgeMax));
+
+  // Phase 3 — name the nearest police station when geography is available.
+  const station = nearestStation(record, opts.policeStations, opts.areaIndex);
+  const stationSuffix = station ? ` — nearest: ${station.name} (${station.distanceM}m)` : '';
 
   if (isChild && hrs != null && hrs > esc.childHours) {
-    flags.push({ type: 'child', message: `Child (${record.age_band}) separated ${hrs}h (> ${esc.childHours}h) — escalate to police.` });
+    flags.push({ type: 'child', message: `Child (${record.age_band}) separated ${hrs}h (> ${esc.childHours}h) — escalate to police${stationSuffix}.` });
   }
   if (OPEN_STATUSES.has(S.norm(record.status)) && hrs != null && hrs > esc.unresolvedHours) {
-    flags.push({ type: 'unresolved', message: `Case open ${hrs}h (> ${esc.unresolvedHours}h) — escalate.` });
+    flags.push({ type: 'unresolved', message: `Case open ${hrs}h (> ${esc.unresolvedHours}h) — escalate${stationSuffix}.` });
+  }
+  // Disability / health condition surfaced in free-text remarks or description.
+  const haystack = S.norm(record.remarks + ' ' + record.physical_description);
+  if (haystack && /\b(deaf|hearing|blind|wheelchair|disabil|handicap|mental|epilep|autis|specially.?abled|divyang)\b/.test(haystack)) {
+    flags.push({ type: 'health', message: `Stated health condition / disability noted — flag for priority handling${stationSuffix}.` });
   }
   return flags;
 }
@@ -202,7 +320,10 @@ module.exports = {
   search,
   looksLikeSamePerson,
   findDuplicatePairs,
+  groupSamePerson,
   escalationFlags,
+  nearestChokepoint,
+  nearestStation,
   hoursAgo,
   OPEN_STATUSES,
 };

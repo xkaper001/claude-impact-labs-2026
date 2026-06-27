@@ -35,9 +35,12 @@ same config doc.
 | `data.js` | Loads config + the 5 CSVs (Node side; swap for PouchDB in browser) |
 | `scoring.js` | `scoreCandidate()` — all weights/bands/adjacency from config; per-field honest breakdown |
 | `search.js` | `preFilter()`, `search()`, duplicate + re-report + escalation flags |
-| `prompt.js` | Injects candidates + config into the Phase-1/2/3 prompt from `prompts.md` |
-| `format.js` | Renders the exact Mode A/B output template |
-| `cli.js` | Run a search from the terminal |
+| `hotspot.js` | `hotspotSweep()` — Mode C ICCC clustering near Traffic choke-points |
+| `geo.js` | Haversine, fuzzy landmark → centroid, location-adjacency, curated location coords |
+| `prompt.js` | Injects candidates + config into the Phase-1/2/3 prompt; `buildHotspotPrompt()` for Mode C |
+| `llm.js` | Swappable `LlmBackend` — `ClaudeBackend` (online) + `LocalBackend` (on-box stub); config-driven via `config.llm.backend`. Called by `web/server` proxy, never the browser |
+| `format.js` | Renders the exact Mode A/B output template + Mode C HOTSPOT template + escalation lines |
+| `cli.js` | Run a search or `--hotspot` sweep from the terminal |
 | `validate.js` | Accuracy harness (planted-twin methodology) |
 
 ## Usage
@@ -56,13 +59,25 @@ node engine/cli.js ... --json
 # Emit the LLM prompt (candidates+config injected) for Phase 1/2/3 instead
 node engine/cli.js ... --prompt 1
 
+# Mode C — ICCC hotspot sweep (open cases clustered near Traffic choke-points)
+node engine/cli.js --hotspot --now "2027-08-12 18:00"
+node engine/cli.js --hotspot --json           # raw result
+node engine/cli.js --hotspot --prompt 2       # Mode C prompt payload for Claude
+
+# Mode B — IDENTIFY (found person → search the reports pool, labeled mode)
+node engine/cli.js --mode B --gender Male --age 72 --state Bihar --loc "Ramkund Ghat"
+
+# Offline landmark resolution — raw free-text → area + nearest zone
+node engine/cli.js --resolve "near Ramkund"
+
 # Accuracy harness
 node engine/validate.js
 ```
 
-Flags: `--name --gender --age|--band --state --district --loc --time --desc
---semantic --prompt --json`. Location vocabulary matches the dataset
-(`Ramkund Ghat`, `Takli Sangam`, `Kushavart Kund`, …).
+Flags: `--name --gender --age|--band --state --district --loc --time --now --desc
+--semantic --mode A|B --resolve --prompt --json --hotspot`. Location vocabulary matches
+the dataset (`Ramkund Ghat`, `Takli Sangam`, `Kushavart Kund`, …); `--now` sets the
+reference time for re-report/escalation age and Mode C trend windows.
 
 ## Scoring (all values from `config-scoring.json`)
 
@@ -104,9 +119,9 @@ degradation (name dropped 30%, age shifted to an adjacent band 25%, location/
 time jittered), then check the engine reunites it.
 
 ```
-Twin reunited in top-3 : 92.7%   <-- cross-center recall
-Twin ranked #1         : 83.3%   (mean rank 1.12)
-  ...at HIGH band      : 83.0%
+Twin reunited in top-3 : 91.7%   <-- cross-center recall
+Twin ranked #1         : 80.3%   (mean rank 1.18)
+  ...at HIGH band      : 83.3%
 Pre-filter cap         : ≤40 candidates, full run < 0.5s
 ```
 
@@ -116,10 +131,13 @@ fully offline. Name + Claude's semantic layer sharpen this further on real data.
 ## What's deterministic vs. what needs Claude
 
 - **Deterministic (offline, this engine):** pre-filter, age/gender/state/
-  location/time/name scoring, banding, duplicate/re-report/escalation flags,
-  output format. Same input → same ranking.
+  location/time/name scoring, banding, duplicate/re-report/`dupReports`-trafficking
+  flags, chokepoint-awareness annotations, nearest-police-station escalation,
+  Mode C hotspot clustering, landmark resolution, output format. Same input → same
+  ranking.
 - **Claude (online):** transcribe/translate the operator's spoken query into the
-  structured query, score the semantic `description`, and write the explanation.
-  Wire-up point is `buildPrompt()` → send to `claude-opus-4-8` (per
+  structured query, score the semantic `description`, and write the explanation
+  (Mode A/B) or the ICCC action prose (Mode C). Wire-up points are
+  `buildPrompt()` / `buildHotspotPrompt()` → send to `claude-opus-4-8` (per
   `config.llm.model`) → read back `description` points and prose.
 ```
