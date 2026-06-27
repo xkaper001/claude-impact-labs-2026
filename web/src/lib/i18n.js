@@ -29,11 +29,11 @@ export const STRINGS = {
   noMatches: { en: 'No likely matches in this center.', hi: 'इस केंद्र में कोई मिलान नहीं।', mr: 'या केंद्रात जुळणी नाही.' },
   hotspot: { en: 'ICCC hotspots', hi: 'आईसीसीसी हॉटस्पॉट', mr: 'आयसीसीसी हॉटस्पॉट' },
   opsMap: { en: 'Ops map', hi: 'ऑप्स मानचित्र', mr: 'ऑप्स नकाशा' },
-  offline: { en: 'Offline — scoring on device', hi: 'ऑफलाइन — स्थानीय स्कोरिंग', mr: 'ऑफलाइन — स्थानिक स्कोअरिंग' },
+  offline: { en: 'Offline · on-device', hi: 'ऑफलाइन · स्थानीय स्कोरिंग', mr: 'ऑफलाइन · स्थानिक स्कोअरिंग' },
   online: { en: 'Online', hi: 'ऑनलाइन', mr: 'ऑनलाइन' },
   semanticPending: { en: 'semantic pending (offline)', hi: 'सिमेंटिक लंबित', mr: 'सिमँटिक प्रलंबित' },
   back: { en: 'Back', hi: 'वापस', mr: 'मागे' },
-  voiceUnsupported: { en: 'Voice not supported — type instead', hi: 'वॉइस असमर्थित — टाइप करें', mr: 'व्हॉइस असमर्थित — टाईप करा' },
+  voiceUnsupported: { en: 'Voice not supported, type instead', hi: 'वॉइस असमर्थित, टाइप करें', mr: 'व्हॉइस असमर्थित, टाईप करा' },
 };
 
 export function t(lang, key) {

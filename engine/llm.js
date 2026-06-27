@@ -42,7 +42,7 @@ async function complete(prompt, config, opts = {}) {
 const ClaudeBackend = {
   async complete(prompt, config, opts = {}) {
     const llm = config.llm || {};
-    const model = llm.model || 'claude-opus-4-8';
+    const model = process.env.CLAUDE_MODEL || llm.model || 'claude-opus-4-8';
     const apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
       // No key configured → degrade gracefully to the offline path rather than throw.

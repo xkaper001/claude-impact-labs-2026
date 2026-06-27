@@ -61,5 +61,15 @@
     "useFor": ["transcribe", "translate", "structure", "semanticDescription", "explain", "duplicateDetection"],
     "languages": ["en", "hi", "mr"],
     "_note": "Swappable. Set backend to 'local' in future to route the same calls through an on-box LLM with zero other changes. When unreachable (offline), the rules engine scores everything except the 'description' (semantic) points and tags them 'semantic pending'."
+  },
+
+  "voice": {
+    "enabled": true,
+    "listen": "nova-3",
+    "listenLanguage": "multi",
+    "think": { "provider": "anthropic", "model": "claude-sonnet-4-20250514" },
+    "speak": "aura-2-asteria-en",
+    "languages": ["en", "hi", "mr"],
+    "_note": "Deepgram Voice Agent intake (online-only enhancement). LISTEN: nova-3 with language 'multi' hears Hindi/Marathi/English code-switching (the hard part — a panicked family). THINK: Claude (Deepgram-managed id: claude-sonnet-4-20250514 / claude-3-5-haiku-latest; opus is NOT Deepgram-hosted, so the match/explain path uses claude-opus-4-8 directly while voice think uses Sonnet). SPEAK: Aura has NO Hindi/Marathi TTS and 'multi' TTS needs ElevenLabs/OpenAI — so the agent SPEAKS English back to the operator (who relays to the family); it still UNDERSTANDS the family's language and captures verbatim Hindi terms in submit_case. To voice the family's own language, switch speak to an eleven_labs/open_ai provider. Structured submit_case output feeds the deterministic engine. Prompt + schema live in config:voiceAgent. Offline → typed form + Whisper.cpp box."
   }
 }

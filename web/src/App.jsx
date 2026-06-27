@@ -3,9 +3,9 @@ import Home from './components/Home.jsx';
 import Intake from './components/Intake.jsx';
 import MatchResults from './components/MatchResults.jsx';
 import OpsMap from './components/OpsMap.jsx';
+import Icon from './components/Icon.jsx';
 import { t, LANGS } from './lib/i18n.js';
-import { seedIfEmpty, startSync, syncState, loadCases, loadConfig } from './lib/db.js';
-import { seedData, config as bundledConfig } from './lib/engine.js';
+import { startSync, syncState, loadAll, emptyData } from './lib/db.js';
 
 export default function App() {
   const [lang, setLang] = useState('en');
@@ -14,8 +14,8 @@ export default function App() {
   const [lastQuery, setLastQuery] = useState(null);
   const [online, setOnline] = useState(navigator.onLine);
   const [sync, setSync] = useState({ configured: false, remote: false });
-  const [data, setData] = useState(seedData);
-  const [config, setConfig] = useState(bundledConfig);
+  const [data, setData] = useState(emptyData);
+  const [config, setConfig] = useState(null);
 
   useEffect(() => {
     const on = () => setOnline(true);
@@ -29,18 +29,19 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    (async () => {
-      await seedIfEmpty();
-      startSync();
-      setSync(syncState());
-      const [cases, cfg] = await Promise.all([loadCases(), loadConfig()]);
-      if (cases.length) {
-        // Merge live cases on top of seed (seed provides geo reference data;
-        // cases come from PouchDB). Engine reads records from this combined set.
-        setData({ ...seedData, records: [...cases, ...seedData.records] });
-      }
-      setConfig(cfg);
-    })();
+    let alive = true;
+    // All data lives in CouchDB (replicated into PouchDB). Reload on mount and
+    // again on every replication change, so the console fills in as docs arrive.
+    const reload = async () => {
+      const d = await loadAll();
+      if (!alive) return;
+      setData(d);
+      setConfig(d.config);
+    };
+    reload();
+    startSync(reload);
+    setSync(syncState());
+    return () => { alive = false; };
   }, []);
 
   const tr = useMemo(() => (k) => t(lang, k), [lang]);
@@ -58,16 +59,19 @@ export default function App() {
   return (
     <div className="app">
       <header className="topbar">
-        <div className="brand" onClick={() => setView('home')}>
-          <span className="logo">_AHB</span>
+        <button className="brand" onClick={() => setView('home')} aria-label={tr('appName')}>
+          <span className="logo"><Icon name="bridge" /></span>
           <div>
             <div className="brand-name">{tr('appName')}</div>
             <div className="brand-sub">{tr('tagline')}</div>
           </div>
-        </div>
+        </button>
         <nav className="nav">
-          <button className={view === 'map' ? 'active' : ''} onClick={() => setView('map')}>
-            {tr('opsMap')}
+          <button
+            className={`nav-link ${view === 'map' ? 'active' : ''}`}
+            onClick={() => setView('map')}
+          >
+            <Icon name="map" /> {tr('opsMap')}
           </button>
           <div className="lang">
             {LANGS.map((l) => (
@@ -76,20 +80,23 @@ export default function App() {
               </button>
             ))}
           </div>
-          <span className={`status ${online ? 'on' : 'off'}`}>
+          <span className={`status ${online ? 'on' : 'off'}`} title={online ? tr('online') : tr('offline')}>
+            <span className="dot" />
             {online ? tr('online') : tr('offline')}
           </span>
         </nav>
       </header>
 
       <main className="content">
-        {view === 'home' && <Home tr={tr} onLost={() => startIntake('lost')} onFound={() => startIntake('found')} sync={sync} />}
+        {view === 'home' && <Home tr={tr} onLost={() => startIntake('lost')} onFound={() => startIntake('found')} onMap={() => setView('map')} sync={sync} />}
         {view === 'intake' && (
           <Intake
             tr={tr}
             lang={lang}
             mode={intakeMode}
             config={config}
+            data={data}
+            online={online}
             onBack={() => setView('home')}
             onSearched={onSearched}
           />

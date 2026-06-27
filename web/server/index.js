@@ -29,6 +29,8 @@ app.get('/api/health', (_req, res) => {
     ok: true,
     llm: (config.llm && config.llm.backend) || 'claude',
     hasAnthropicKey: !!process.env.ANTHROPIC_API_KEY,
+    hasDeepgramKey: !!process.env.DEEPGRAM_API_KEY,
+    voice: !!(config.voice && config.voice.enabled),
     whisperBox: !!process.env.WHISPER_BOX_URL,
   });
 });
@@ -46,6 +48,39 @@ app.post('/api/llm', async (req, res) => {
   }
 });
 
+// Provide the browser Voice Agent its WebSocket credential. Browsers can't set
+// headers, so the client authenticates via the Sec-WebSocket-Protocol subprotocol
+// (['<scheme>', <token>]). Two paths:
+//   1. PREFERRED — mint a short-lived JWT via /v1/auth/grant (needs an API key
+//      with Member+ role). Returns { scheme:'bearer', token:<jwt> }; raw key never
+//      leaves the server.
+//   2. FALLBACK — if grant is unavailable (e.g. 403: restricted key role), return
+//      the API key itself with { scheme:'token' }. The browser uses it directly
+//      (['token', key]). This exposes the key to the client — acceptable for a
+//      local/single-kendra demo; for production, use a Member+ key so path 1 works.
+app.post('/api/deepgram-token', async (req, res) => {
+  const key = process.env.DEEPGRAM_API_KEY;
+  if (!key) return res.status(503).json({ error: 'no_deepgram_key' });
+  const ttl = Math.min(3600, Math.max(10, Number(req.body?.ttl_seconds) || 60));
+  try {
+    const r = await fetch('https://api.deepgram.com/v1/auth/grant', {
+      method: 'POST',
+      headers: { Authorization: `Token ${key}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ttl_seconds: ttl }),
+    });
+    if (r.ok) {
+      const data = await r.json();
+      return res.json({ scheme: 'bearer', token: data.access_token, expires: data.expires_in });
+    }
+    // Grant not permitted for this key — fall back to direct API-key auth.
+    console.warn(`deepgram grant unavailable (${r.status}); serving raw key to client`);
+    res.json({ scheme: 'token', token: key, fallback: `grant_http_${r.status}` });
+  } catch (e) {
+    // Network failure reaching the grant API — still allow direct auth.
+    res.json({ scheme: 'token', token: key, fallback: 'grant_unreachable', detail: e.message });
+  }
+});
+
 // Whisper.cpp box STT. The box exposes /inference and accepts an audio file
 // multipart upload; it returns { text: "..." }. See DESIGN.md §STT.
 app.post('/api/stt', upload.single('audio'), async (req, res) => {
@@ -55,9 +90,13 @@ app.post('/api/stt', upload.single('audio'), async (req, res) => {
   }
   try {
     const form = new FormData();
-    form.append('audio', new Blob([req.file.buffer], { type: req.file.mimetype }), req.file.originalname);
+    // whisper.cpp server: field name is `file`, returns { text } with response_format=json.
+    form.append('file', new Blob([req.file.buffer], { type: req.file.mimetype }), req.file.originalname);
+    form.append('response_format', 'json');
     if (req.body.language) form.append('language', req.body.language);
-    const r = await fetch(`${box}/inference`, { method: 'POST', body: form });
+    // WHISPER_BOX_URL is the base (e.g. http://localhost:8080); endpoint is /inference.
+    const endpoint = box.replace(/\/inference\/?$/, '') + '/inference';
+    const r = await fetch(endpoint, { method: 'POST', body: form });
     if (!r.ok) return res.status(502).json({ text: '', pending: true, reason: `box_http_${r.status}` });
     const data = await r.json();
     res.json({ text: data.text || '', box: true });
