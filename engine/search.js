@@ -62,6 +62,37 @@ function nearestStation(record, policeStations, areaIndex) {
 }
 
 // ---------------------------------------------------------------------------
+// Lost/Found cross-type partitioning
+// ---------------------------------------------------------------------------
+
+/** Narrow the candidate pool to the OPPOSITE report type of the query.
+ *  Mode A (lost query) searches found-person records; Mode B (found query)
+ *  searches lost-person records — that is how a lost report meets a found
+ *  registry entry and vice versa.
+ *
+ *  Self-gating: if NO record in the pool carries a `report_type`, the dataset
+ *  is legacy (pre-report_type, e.g. the CSV-backed CLI / accuracy harness) and
+ *  the pool is returned unchanged so those paths keep working. Records that
+ *  lack `report_type` in a typed pool are treated as 'lost' (the seed default).
+ *  Also skips when `config.matching.crossType === false` (explicit opt-out). */
+function byReportType(records, mode, config) {
+  if (!records || !records.length) return records || [];
+  if (config && config.matching && config.matching.crossType === false) return records;
+  const wantType = String(mode || 'A').toUpperCase() === 'A' ? 'found' : 'lost';
+  let hasTyped = false;
+  for (let i = 0; i < records.length; i++) {
+    if (records[i] && records[i].report_type) { hasTyped = true; break; }
+  }
+  if (!hasTyped) return records;
+  return records.filter((r) => {
+    if (!r) return false;
+    const rt = r.report_type;
+    if (!rt) return wantType === 'lost';
+    return String(rt).toLowerCase() === wantType;
+  });
+}
+
+// ---------------------------------------------------------------------------
 // Pre-filter
 // ---------------------------------------------------------------------------
 
@@ -121,7 +152,10 @@ function preFilter(query, records, config, opts = {}) {
 
 function search(query, records, config, opts = {}) {
   const mode = (opts.mode || 'A').toUpperCase(); // 'A' | 'B'
-  const candidates = preFilter(query, records, config, opts);
+  // Lost/Found cross-type: a lost query (A) searches found records, a found
+  // query (B) searches lost records. Self-gating — no-op on untyped pools.
+  const typedPool = byReportType(records, mode, config);
+  const candidates = preFilter(query, typedPool, config, opts);
 
   const scored = candidates
     .map((r) => ({ record: r, ...S.scoreCandidate(query, r, config, opts) }))
@@ -198,7 +232,7 @@ function search(query, records, config, opts = {}) {
   return {
     mode,
     query,
-    recordsSearched: records.length,
+    recordsSearched: typedPool.length,
     candidatesConsidered: candidates.length,
     semanticMode: opts.semantic == null ? 'pending' : opts.semantic,
     matches,
@@ -318,6 +352,7 @@ function hoursAgo(reportedAt, now) {
 module.exports = {
   preFilter,
   search,
+  byReportType,
   looksLikeSamePerson,
   findDuplicatePairs,
   groupSamePerson,

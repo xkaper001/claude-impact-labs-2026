@@ -63,6 +63,11 @@
     "_note": "Swappable. Set backend to 'local' in future to route the same calls through an on-box LLM with zero other changes. When unreachable (offline), the rules engine scores everything except the 'description' (semantic) points and tags them 'semantic pending'."
   },
 
+  "matching": {
+    "crossType": true,
+    "_note": "Lost/Found cross-type matching. Mode A (lost) searches report_type='found' records; Mode B (found) searches report_type='lost' records. The filter is self-gating: it only applies when at least one record carries a report_type (so the CSV-backed CLI and accuracy harness keep working), and records without report_type are treated as 'lost'. Set crossType:false to search all records (legacy)."
+  },
+
   "voice": {
     "enabled": true,
     "listen": "nova-3",

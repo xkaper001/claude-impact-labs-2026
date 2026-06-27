@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Icon from './Icon.jsx';
-import { saveCase, audit } from '../lib/db.js';
-import { transcribe } from '../lib/llm.js';
+import { saveCase, audit, centerId } from '../lib/db.js';
+import { transcribe, complete } from '../lib/llm.js';
 import { recordAudio, stopRecorder } from '../lib/voice.js';
-import { locationVocab, submitCaseToQuery } from '../lib/engine.js';
+import { locationVocab, submitCaseToQuery, ageBandFromApprox, buildStructurePrompt, parseStructureFields } from '../lib/engine.js';
 import { startVoiceAgent } from '../lib/voiceAgent.js';
 
 // Fallback list, used only before the dataset has synced in from CouchDB.
@@ -11,6 +11,10 @@ const FALLBACK_LOCATIONS = [
   'Ramkund Ghat', 'Panchavati Circle', 'Dwarka Circle', 'Nashik Road Railway Station',
   'Kumbh Mela Ground', 'Godavari Ghat', 'Tapovan', 'Nashik CBS Bus Stand',
 ];
+
+// Representative numeric age for a band, used when Claude's structure output
+// gives an age_band but no age_approx (the form collects a numeric age).
+const BAND_MID = { '0-12': 8, '13-17': 15, '18-40': 29, '41-60': 50, '61-70': 65, '71-80': 75, '80+': 82 };
 
 const AGENT_STATE_LABEL = {
   connecting: 'Connecting to the voice agent…',
@@ -20,7 +24,7 @@ const AGENT_STATE_LABEL = {
   closed: 'Voice session ended.',
 };
 
-export default function Intake({ tr, lang, mode, config, data, online, onBack, onSearched }) {
+export default function Intake({ tr, lang, mode, config, data, online, onBack, onSearched, onCaseSaved }) {
   // Real last-seen vocabulary from the active dataset; falls back before sync.
   const locations = useMemo(() => {
     const v = locationVocab(data || {});
@@ -40,11 +44,14 @@ export default function Intake({ tr, lang, mode, config, data, online, onBack, o
     state: '',
     last_seen_location: '',
     physical_description: '',
+    reporter_mobile: '',
     reported_at: new Date().toISOString().slice(0, 16).replace('T', ' '),
   });
   const [recording, setRecording] = useState(false);
   const [busy, setBusy] = useState(false);
   const [sttNote, setSttNote] = useState('');
+  const [structuring, setStructuring] = useState(false);
+  const [structNote, setStructNote] = useState('');
   const recPromise = useRef(null);
 
   // Voice-agent session state.
@@ -93,14 +100,16 @@ export default function Intake({ tr, lang, mode, config, data, online, onBack, o
             reporter_mobile: args.reporter_mobile || '',
             reported_at: new Date().toISOString().slice(0, 16).replace('T', ' '),
             case_id: `loc-${Date.now()}`,
-            reporting_center: mode,
+            reporting_center: centerId(),
+            report_type: (args.mode || mode) === 'found' ? 'found' : 'lost',
             status: 'pending',
             is_duplicate_report: 'No',
           };
           saveCase(record).catch(() => {});
           audit({ type: 'voice_intake', mode, fields: Object.keys(args) }).catch(() => {});
+          if (onCaseSaved) onCaseSaved(record.case_id, mode);
           stopAgent();
-          onSearched({ ...submitCaseToQuery(args), mode: searchMode });
+          onSearched({ ...submitCaseToQuery(args), mode: searchMode, caseId: record.case_id });
         },
       });
     } catch (e) {
@@ -137,12 +146,15 @@ export default function Intake({ tr, lang, mode, config, data, online, onBack, o
   async function submit(searchToo) {
     const record = {
       ...form,
+      age_band: ageBandFromApprox(form.ageApprox),
       case_id: `loc-${Date.now()}`,
-      reporting_center: mode,
+      reporting_center: centerId(),
+      report_type: mode === 'found' ? 'found' : 'lost',
       status: 'pending',
       is_duplicate_report: 'No',
     };
     await saveCase(record);
+    if (onCaseSaved) onCaseSaved(record.case_id, mode);
     if (searchToo) {
       onSearched({
         name: form.missing_person_name || undefined,
@@ -152,6 +164,8 @@ export default function Intake({ tr, lang, mode, config, data, online, onBack, o
         lastSeenLocation: form.last_seen_location,
         description: form.physical_description,
         reportedAt: form.reported_at,
+        mode: mode === 'found' ? 'B' : 'A',
+        caseId: record.case_id,
       });
     } else {
       onBack();
@@ -168,7 +182,49 @@ export default function Intake({ tr, lang, mode, config, data, online, onBack, o
       lastSeenLocation: form.last_seen_location,
       description: form.physical_description,
       reportedAt: form.reported_at,
+      mode: mode === 'found' ? 'B' : 'A',
     });
+  }
+
+  // Optional AI structuring of the typed free-text into form fields. Online-only;
+  // disabled when offline or there's nothing to structure. Preserves any field
+  // the operator already filled (Claude output only fills empty/blank fields).
+  async function runStructure() {
+    if (!online || structuring) return;
+    const raw = [form.missing_person_name, form.last_seen_location, form.physical_description]
+      .filter(Boolean).join(' · ');
+    if (!raw.trim()) return;
+    setStructuring(true);
+    setStructNote('');
+    try {
+      const out = await complete(buildStructurePrompt(raw), { capability: 'structure' });
+      setStructuring(false);
+      if (out.pending || !out.text) { setStructNote(tr('structureFailed')); return; }
+      const fields = parseStructureFields(out.text);
+      if (!Object.keys(fields).length) { setStructNote(tr('structureFailed')); return; }
+      setForm((f) => {
+        const next = { ...f };
+        const take = (k, v) => { if (v !== '' && v != null && String(next[k] ?? '').trim() === '') next[k] = v; };
+        take('missing_person_name', fields.missing_person_name);
+        take('state', fields.state);
+        take('last_seen_location', fields.last_seen_location);
+        take('physical_description', fields.physical_description);
+        take('reporter_mobile', fields.reporter_mobile);
+        take('gender', fields.gender);
+        // Age: prefer an explicit numeric age_approx; else derive from the band.
+        if (fields.age_approx && String(fields.age_approx) !== '0' && String(next.ageApprox).trim() === '') {
+          next.ageApprox = String(fields.age_approx);
+        } else if (fields.age_band && BAND_MID[fields.age_band] && String(next.ageApprox).trim() === '') {
+          next.ageApprox = String(BAND_MID[fields.age_band]);
+        }
+        return next;
+      });
+      setStructNote(tr('structured'));
+      audit({ type: 'structure', fields: Object.keys(fields) }).catch(() => {});
+    } catch {
+      setStructuring(false);
+      setStructNote(tr('structureFailed'));
+    }
   }
 
   const isLost = mode === 'lost';
@@ -253,6 +309,7 @@ export default function Intake({ tr, lang, mode, config, data, online, onBack, o
             <select value={form.gender} onChange={(e) => set('gender', e.target.value)}>
               <option>{tr('male')}</option>
               <option>{tr('female')}</option>
+              <option>{tr('other')}</option>
             </select>
           </div>
         </div>
@@ -274,10 +331,29 @@ export default function Intake({ tr, lang, mode, config, data, online, onBack, o
         </div>
 
         <div className="field">
+          <label>{tr('mobile')}</label>
+          <input value={form.reporter_mobile} onChange={(e) => set('reporter_mobile', e.target.value)} placeholder="+91 … (one contact is enough)" />
+        </div>
+
+        <div className="field">
           <label>{tr('description')}</label>
           <textarea rows={3} value={form.physical_description}
             onChange={(e) => set('physical_description', e.target.value)}
             placeholder="elderly man, white kurta, rudraksha mala…" />
+        </div>
+
+        <div className="voice-bar" style={{ marginTop: 8 }}>
+          <button
+            className="btn sm ghost"
+            onClick={runStructure}
+            disabled={!online || structuring || !form.physical_description}
+          >
+            <Icon name="spark" /> {structuring ? tr('structuring') : tr('structure')}
+          </button>
+          {structuring && <span className="voice-hint">{tr('structuring')}</span>}
+          {!structuring && structNote && <span className="voice-hint">{structNote}</span>}
+          {!structuring && !structNote && online && <span className="voice-hint">Paste a Hindi/English note, then fill the fields from it.</span>}
+          {!online && <span className="voice-hint">Online only — type the fields manually.</span>}
         </div>
       </div>
 

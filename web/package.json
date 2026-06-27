@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "server": "node --env-file=.env server/index.js",
     "seed": "node --env-file=.env server/seed-couchdb.js",
+    "migrate": "node --env-file=.env server/migrate-report-type.js",
     "start": "concurrently -k -n web,api \"vite\" \"node --env-file=.env server/index.js\""
   },
   "dependencies": {

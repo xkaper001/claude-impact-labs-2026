@@ -14,11 +14,11 @@ import geoMod from '@engine/geo.js';
 import promptMod from '@engine/prompt.js';
 import scoringMod from '@engine/scoring.js';
 
-const { search, preFilter } = searchMod;
+const { search, preFilter, byReportType } = searchMod;
 const { hotspotSweep } = hotspotMod;
 const geo = geoMod;
 const { buildPrompt, buildHotspotPrompt } = promptMod;
-const { scoreCandidate } = scoringMod;
+const { scoreCandidate, ageToBands } = scoringMod;
 
 // Geo options are derived purely from the dataset (areaIndex + the O(vocab²)
 // haversine adjacency), so they're stable for a given `data` object. Cache by
@@ -87,6 +87,15 @@ export function submitCaseToQuery(args = {}, opts = {}) {
   };
 }
 
+/** Pick a single age_band for a saved record from an approximate numeric age.
+ *  Uses the engine's ageToBands (which straddles edge ages) and takes the
+ *  first; returns '' when no band can be derived. Ensures manually-entered
+ *  cases are visible to preFilter's age gate. */
+export function ageBandFromApprox(age) {
+  const bands = ageToBands(age);
+  return bands.length ? bands[0] : '';
+}
+
 export function runHotspot(data, opts = {}) {
   return hotspotSweep(data.records, data.zones, data.chokepoints, data.policeStations, data.config, {
     now: opts.now,
@@ -101,10 +110,12 @@ export function runResolve(text, data) {
 }
 
 /** Assemble the Phase-n prompt for the LLM proxy. The proxy (server) runs the
- *  LlmBackend; the browser never sees the API key. */
+ *  LlmBackend; the browser never sees the API key. Uses the same cross-type
+ *  pool as runSearch so explain sees the candidates actually being ranked. */
 export function buildPromptForClaude(query, data, opts = {}) {
   const geoOpts = buildGeoOpts(data);
-  const candidates = preFilter(query, data.records, data.config, geoOpts);
+  const pool = byReportType(data.records, (query && query.mode) || 'A', data.config);
+  const candidates = preFilter(query, pool, data.config, geoOpts);
   return buildPrompt(candidates, data.config, { phase: opts.phase || 2, md: data.promptsText });
 }
 
@@ -163,6 +174,45 @@ export function parseSemanticScores(text) {
   }
 }
 
+/** Prompt for the typed-path "Structure with Claude" button: take the
+ *  operator's free-text intake note (Hindi/Marathi/English, often romanized)
+ *  and extract the structured intake fields. Missing fields → empty string;
+ *  never invent values. physical_description is cleaned but kept vernacular.
+ *  Returns STRICT JSON. */
+export function buildStructurePrompt(rawText) {
+  return [
+    'You structure a missing-person intake note typed by a volunteer at the Kumbh Mela.',
+    'The note may be Hindi, Marathi, or English (often romanized). Extract the fields below.',
+    'Translate vernacular terms into the field values; keep physical_description as a short clean phrase (English + original terms).',
+    'Map age to a band: 0-12, 13-17, 18-40, 41-60, 61-70, 71-80, 80+. Also give age_approx (integer, 0 if unknown).',
+    'gender is one of: Male, Female, Other.',
+    'Use empty string for any field you cannot infer from the note. NEVER invent values.',
+    '',
+    `NOTE: ${JSON.stringify(rawText || '')}`,
+    '',
+    'Respond with ONLY a JSON object with keys: missing_person_name, age_band, age_approx, gender, state, last_seen_location, physical_description, reporter_mobile. No prose.',
+  ].join('\n');
+}
+
+/** Parse the structure model's JSON reply (tolerates code fences / prose) into
+ *  a field map. Returns {} on any failure — caller keeps the form as-is. */
+export function parseStructureFields(text) {
+  if (!text) return {};
+  try {
+    const m = text.match(/\{[\s\S]*\}/);
+    if (!m) return {};
+    const obj = JSON.parse(m[0]);
+    const allowed = ['missing_person_name', 'age_band', 'age_approx', 'gender', 'state', 'last_seen_location', 'physical_description', 'reporter_mobile'];
+    const out = {};
+    for (const k of allowed) {
+      if (Object.prototype.hasOwnProperty.call(obj, k) && obj[k] != null) out[k] = String(obj[k]).trim();
+    }
+    return out;
+  } catch {
+    return {};
+  }
+}
+
 /** Re-score the current matches using Claude's per-candidate semantic numbers
  *  (falling back to the offline heuristic for any candidate Claude didn't score),
  *  then re-sort. Preserves each match's warnings / escalation / chokepoint info;
@@ -183,6 +233,90 @@ export function rerankWithSemantic(query, data, matches, semanticByCaseId = {}) 
     String((a.record || a).case_id || '').localeCompare(String((b.record || b).case_id || '')),
   );
   return rescored;
+}
+
+/** Build the "scenario" the control center shows when a search runs: the
+ *  resolved focus coordinate (query.lastSeenLocation → centroid), the nearest
+ *  traffic chokepoint, the nearest police station, and any hotspot cluster
+ *  overlapping the focus. Feeds both ControlMap's scenario overlay and the
+ *  ResultsPanel scenario card. Returns { focus, nearestChokepoint,
+ *  nearestStation, hotspot } — any field may be null when geo can't resolve. */
+export function scenarioFor(query, data) {
+  const geoOpts = buildGeoOpts(data);
+  const focus = query && query.lastSeenLocation ? runResolve(query.lastSeenLocation, data) : null;
+  const focusPoint = focus ? { lat: focus.lat, lng: focus.lng, name: focus.name, radiusM: (data.config?.cluster?.radiusMeters) || 400 } : null;
+
+  let nearestCp = null;
+  let nearestStat = null;
+  if (focusPoint) {
+    const pseudo = { last_seen_location: query.lastSeenLocation };
+    // Use a generous radius so we always surface the nearest chokepoint to the
+    // focus, not just ones within the tight awareness window.
+    const cpHit = searchMod.nearestChokepoint(pseudo, data.chokepoints, geoOpts.areaIndex, 5000);
+    if (cpHit) nearestCp = cpHit;
+    const stHit = searchMod.nearestStation(pseudo, data.policeStations, geoOpts.areaIndex);
+    if (stHit) nearestStat = stHit;
+  }
+
+  // Overlap with an existing Mode-C hotspot cluster (within the cluster radius).
+  let hotspot = null;
+  if (focusPoint) {
+    const hotspots = (runHotspot(data).hotspots || []);
+    for (const h of hotspots) {
+      if (h.lat == null || h.lng == null) continue;
+      const d = geo.haversine([focusPoint.lng, focusPoint.lat], [h.lng, h.lat]);
+      if (d <= Math.max(600, (h.caseCount || 1) * 90)) { hotspot = h; break; }
+    }
+  }
+
+  return { focus: focusPoint, nearestChokepoint: nearestCp, nearestStation: nearestStat, hotspot };
+}
+
+/** Resolve a single case_id to a coordinate (for feed-click map focus). */
+export function caseCoord(caseId, data) {
+  const r = (data.records || []).find((x) => x.case_id === caseId);
+  if (!r || !r.last_seen_location) return null;
+  return runResolve(r.last_seen_location, data);
+}
+
+/** "Xh ago" / "Xd ago" label for a reported_at, relative to `now` (default now). */
+export function relativeTime(reportedAt, now) {
+  const hrs = searchMod.hoursAgo(reportedAt, now);
+  if (hrs == null) return '';
+  if (hrs <= 0) return 'just now';
+  if (hrs < 1) return '<1h ago';
+  if (hrs < 24) return `${hrs}h ago`;
+  return `${Math.round(hrs / 24)}d ago`;
+}
+
+/** Build the auto-scrolling lost & found feed list from the active dataset.
+ *  Sorted newest-first, capped at `limit`. `kind` = 'found' when the case is
+ *  resolved/identified or was registered as a found-person intake, else 'lost'. */
+export function feedItems(data, { limit = 40 } = {}) {
+  const rows = (data.records || []).slice().sort((a, b) =>
+    String(b.reported_at || '').localeCompare(String(a.reported_at || '')),
+  );
+  return rows.slice(0, limit).map((r) => {
+    // report_type is the source of truth once set; fall back to the status
+    // heuristic for legacy records that predate the field (mid-migration safe).
+    const rt = r.report_type ? String(r.report_type).toLowerCase() : '';
+    const status = String(r.status || '').toLowerCase();
+    const center = String(r.reporting_center || '').toLowerCase();
+    const found = rt ? rt === 'found'
+      : status === 'reunited' || status === 'resolved' ||
+        status === 'identified' || status === 'found' || center === 'found';
+    return {
+      case_id: r.case_id,
+      name: r.missing_person_name || 'Unnamed',
+      gender: r.gender,
+      age_band: r.age_band,
+      last_seen_location: r.last_seen_location,
+      reporting_center: r.reporting_center,
+      reported_at: r.reported_at,
+      status: r.status,
+      kind: found ? 'found' : 'lost',
+    };
+  });
 }
 
 export { geo };

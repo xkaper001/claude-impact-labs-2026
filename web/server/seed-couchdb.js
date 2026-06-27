@@ -68,6 +68,9 @@ function buildDocs() {
     kind: 'case',
     center: CENTER,
     createdAt: now,
+    // Seed rows are family-filed missing reports → lost. Mode B (found) intake
+    // searches these; Mode A (lost) searches the found-pool (grown by intake).
+    report_type: 'lost',
     ...r,
   }));
 

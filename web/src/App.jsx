@@ -1,17 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import Home from './components/Home.jsx';
-import Intake from './components/Intake.jsx';
-import MatchResults from './components/MatchResults.jsx';
-import OpsMap from './components/OpsMap.jsx';
+import Dashboard from './components/Dashboard.jsx';
 import Icon from './components/Icon.jsx';
 import { t, LANGS } from './lib/i18n.js';
 import { startSync, syncState, loadAll, emptyData } from './lib/db.js';
+import { runSearch, scenarioFor } from './lib/engine.js';
 
 export default function App() {
   const [lang, setLang] = useState('en');
-  const [view, setView] = useState('home'); // home | intake | matches | map
+  const [intakeOpen, setIntakeOpen] = useState(false);
   const [intakeMode, setIntakeMode] = useState('lost'); // lost | found
-  const [lastQuery, setLastQuery] = useState(null);
+  const [searchState, setSearchState] = useState(null); // { query, result, scenario }
+  const [newCaseIds, setNewCaseIds] = useState([]); // recently-registered case IDs (for feed/map highlight)
   const [online, setOnline] = useState(navigator.onLine);
   const [sync, setSync] = useState({ configured: false, remote: false });
   const [data, setData] = useState(emptyData);
@@ -46,33 +45,69 @@ export default function App() {
 
   const tr = useMemo(() => (k) => t(lang, k), [lang]);
 
-  function startIntake(mode) {
+  function openIntake(mode) {
     setIntakeMode(mode);
-    setView('intake');
+    setIntakeOpen(true);
   }
 
-  function onSearched(query) {
-    setLastQuery(query);
-    setView('matches');
+  // Inline search: stay on the dashboard, compute matches + scenario, let the
+  // map fly to the resolved zone and the ResultsPanel slide in.
+  function onSearch(query) {
+    if (!data.config) return;
+    const result = runSearch(query, data, { mode: query.mode || 'A', now: query.reportedAt });
+    const scenario = scenarioFor(query, data);
+    setSearchState({ query, result, scenario });
+  }
+
+  function clearSearch() {
+    setSearchState(null);
+  }
+
+  // A newly-registered case (lost or found) is highlighted in the feed and
+  // pinged on the map for a short window so the control center notices it.
+  function registerNewCase(caseId) {
+    if (!caseId) return;
+    setNewCaseIds((ids) => (ids.includes(caseId) ? ids : [...ids, caseId]));
+    setTimeout(() => {
+      setNewCaseIds((ids) => ids.filter((id) => id !== caseId));
+    }, 60000);
   }
 
   return (
     <div className="app">
       <header className="topbar">
-        <button className="brand" onClick={() => setView('home')} aria-label={tr('appName')}>
-          <span className="logo"><Icon name="bridge" /></span>
-          <div>
-            <div className="brand-name">{tr('appName')}</div>
-            <div className="brand-sub">{tr('tagline')}</div>
-          </div>
+        <button className="brand" aria-label={tr('appName')}>
+          <span className="logo" aria-hidden="true">
+            <svg viewBox="0 0 48 48" width="42" height="42">
+              <defs>
+                <linearGradient id="ksLogo" x1="0" y1="0" x2="1" y2="1">
+                  <stop offset="0" stopColor="#ff9933" />
+                  <stop offset=".55" stopColor="#ff7a59" />
+                  <stop offset="1" stopColor="#3b6fd4" />
+                </linearGradient>
+              </defs>
+              <rect x="3" y="3" width="42" height="42" rx="13" fill="url(#ksLogo)" />
+              {/* Reuniting person above the bridge (Setu) */}
+              <circle cx="24" cy="13.5" r="3.4" fill="#fff" />
+              <path d="M24 17.5v3.5" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round" />
+              {/* Bridge arches spanning the rivers/convergence */}
+              <path
+                d="M9 31h30 M9 31c4-9.5 26-9.5 30 0 M15 31v6 M24 28.5v8.5 M33 31v6"
+                fill="none" stroke="#fff" strokeWidth="2.2"
+                strokeLinecap="round" strokeLinejoin="round"
+              />
+            </svg>
+          </span>
+          <span className="brand-text">
+            <span className="brand-name">{tr('appName')}</span>
+            <span className="brand-sub">{tr('tagline')}</span>
+          </span>
         </button>
+
+        <span className="topbar-divider" aria-hidden="true" />
+        <span className="topbar-badge"><Icon name="map" /> ICCC · Control Center</span>
+
         <nav className="nav">
-          <button
-            className={`nav-link ${view === 'map' ? 'active' : ''}`}
-            onClick={() => setView('map')}
-          >
-            <Icon name="map" /> {tr('opsMap')}
-          </button>
           <div className="lang">
             {LANGS.map((l) => (
               <button key={l} className={lang === l ? 'active' : ''} onClick={() => setLang(l)}>
@@ -88,23 +123,23 @@ export default function App() {
       </header>
 
       <main className="content">
-        {view === 'home' && <Home tr={tr} onLost={() => startIntake('lost')} onFound={() => startIntake('found')} onMap={() => setView('map')} sync={sync} />}
-        {view === 'intake' && (
-          <Intake
-            tr={tr}
-            lang={lang}
-            mode={intakeMode}
-            config={config}
-            data={data}
-            online={online}
-            onBack={() => setView('home')}
-            onSearched={onSearched}
-          />
-        )}
-        {view === 'matches' && (
-          <MatchResults tr={tr} lang={lang} query={lastQuery} data={data} online={online} onBack={() => setView('intake')} />
-        )}
-        {view === 'map' && <OpsMap tr={tr} data={data} online={online} />}
+        <Dashboard
+          tr={tr}
+          lang={lang}
+          config={config}
+          data={data}
+          online={online}
+          sync={sync}
+          newCaseIds={newCaseIds}
+          searchState={searchState}
+          onSearch={onSearch}
+          onClearSearch={clearSearch}
+          onOpenIntake={openIntake}
+          intakeOpen={intakeOpen}
+          intakeMode={intakeMode}
+          onCloseIntake={() => setIntakeOpen(false)}
+          onCaseSaved={registerNewCase}
+        />
       </main>
     </div>
   );
