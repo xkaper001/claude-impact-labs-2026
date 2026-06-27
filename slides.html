@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Setu — Kumbh Mela Missing Persons · Build Plan</title>
+<script>
+  // apply theme before paint
+  (function () {
+    try {
+      var t = localStorage.getItem('theme');
+      if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      if (t === 'dark') document.documentElement.classList.add('dark');
+    } catch (e) {}
+  })();
+</script>
+<style>
+  :root {
+    --ivory:    #FAF9F5;
+    --slate:    #141413;
+    --clay:     #D97757;
+    --clay-dim: #c4633f;
+    --oat:      #E3DACC;
+    --olive:    #788C5D;
+    --rust:     #B5503A;
+    --gray-150: #F0EEE6;
+    --gray-300: #D1CFC5;
+    --gray-500: #87867F;
+    --gray-700: #3D3D3A;
+    --white:    #FFFFFF;
+
+    --bg:       var(--ivory);
+    --surface:  var(--white);
+    --surface-2:var(--gray-150);
+    --border:   var(--gray-300);
+    --ink:      var(--gray-700);
+    --ink-strong: var(--slate);
+    --muted:    var(--gray-500);
+    --accent:   var(--clay);
+
+    --serif: ui-serif, Georgia, 'Times New Roman', serif;
+    --sans:  system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --mono:  ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
+  }
+  html.dark {
+    --bg:        #1a1a18;
+    --surface:   #242422;
+    --surface-2: #2d2d2a;
+    --border:    #3a3a36;
+    --ink:       #d8d6cd;
+    --ink-strong:#f4f2ec;
+    --muted:     #8f8e85;
+    --oat:       #3a352b;
+    --gray-150:  #2d2d2a;
+    --accent:    #e08a6a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.58;
+    padding: 48px 24px 120px;
+    -webkit-font-smoothing: antialiased;
+    transition: background .25s, color .25s;
+  }
+  .page { max-width: 1080px; margin: 0 auto; }
+
+  /* theme toggle */
+  .toggle {
+    position: fixed; top: 18px; right: 18px; z-index: 50;
+    background: var(--surface); border: 1.5px solid var(--border);
+    color: var(--ink); border-radius: 10px; padding: 8px 12px;
+    font-family: var(--mono); font-size: 12px; cursor: pointer;
+    display: flex; align-items: center; gap: 7px;
+  }
+  .toggle:hover { border-color: var(--accent); color: var(--ink-strong); }
+
+  /* header */
+  header.page-head { margin-bottom: 44px; max-width: 860px; }
+  .eyebrow {
+    font-size: 12px; letter-spacing: .09em; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 14px; font-family: var(--mono);
+  }
+  h1 {
+    font-family: var(--serif); font-weight: 500; font-size: 42px;
+    line-height: 1.12; color: var(--ink-strong); margin-bottom: 6px;
+    letter-spacing: -0.015em;
+  }
+  .h1-sub { font-family: var(--serif); font-style: italic; font-size: 20px; color: var(--accent); margin-bottom: 20px; }
+  .lede { font-size: 16.5px; color: var(--ink); max-width: 760px; }
+  .lede b { color: var(--ink-strong); }
+
+  .prompt-box {
+    background: var(--surface-2); border: 1.5px solid var(--border);
+    border-radius: 12px; padding: 14px 18px; font-size: 14px;
+    color: var(--ink); margin-top: 22px;
+  }
+  .prompt-box .label {
+    font-family: var(--mono); font-size: 11px; text-transform: uppercase;
+    letter-spacing: .06em; color: var(--muted); display: block; margin-bottom: 6px;
+  }
+
+  /* summary strip */
+  .summary {
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
+    margin: 36px 0 60px;
+  }
+  @media (max-width: 820px) { .summary { grid-template-columns: repeat(2, 1fr); } }
+  .summary .cell {
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 12px; padding: 16px 16px;
+  }
+  .summary .k { font-family: var(--serif); font-size: 28px; color: var(--ink-strong); line-height: 1.1; }
+  .summary .k small { font-size: 15px; color: var(--accent); }
+  .summary .v { font-size: 12.5px; color: var(--muted); margin-top: 4px; }
+
+  /* sections */
+  section { margin-bottom: 60px; scroll-margin-top: 24px; }
+  .sec-head { display: flex; align-items: baseline; gap: 13px; margin-bottom: 10px; }
+  .sec-head .num {
+    font-family: var(--mono); font-size: 12px; background: var(--oat);
+    color: var(--ink-strong); padding: 3px 9px; border-radius: 8px;
+  }
+  .sec-head h2 {
+    font-family: var(--serif); font-weight: 500; font-size: 27px;
+    color: var(--ink-strong); letter-spacing: -0.01em;
+  }
+  .sec-intro { font-size: 14.5px; color: var(--muted); max-width: 740px; margin-bottom: 26px; }
+
+  .card {
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 14px; padding: 22px 24px; margin-bottom: 16px;
+  }
+  .card h3 { font-family: var(--serif); font-weight: 500; font-size: 19px; color: var(--ink-strong); margin-bottom: 8px; }
+  .card p { font-size: 14.5px; margin-bottom: 10px; }
+  .card p:last-child { margin-bottom: 0; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+  @media (max-width: 820px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+  .pill {
+    display: inline-block; font-family: var(--mono); font-size: 11px;
+    padding: 2px 8px; border-radius: 20px; border: 1px solid var(--border);
+    color: var(--muted); margin: 0 4px 4px 0;
+  }
+  .pill.on { background: var(--olive); color: #fff; border-color: var(--olive); }
+  .pill.warn { background: var(--rust); color: #fff; border-color: var(--rust); }
+
+  ul.clean { list-style: none; }
+  ul.clean li { position: relative; padding-left: 20px; font-size: 14.5px; margin-bottom: 7px; }
+  ul.clean li::before { content: "→"; position: absolute; left: 0; color: var(--accent); }
+
+  .muted-note { font-size: 13px; color: var(--muted); font-style: italic; }
+
+  /* the "why people are different" callout */
+  .persona {
+    border-left: 3px solid var(--accent); background: var(--surface-2);
+    padding: 14px 18px; border-radius: 0 10px 10px 0; margin-bottom: 12px;
+  }
+  .persona b { color: var(--ink-strong); }
+
+  /* interactive matcher demo */
+  .demo {
+    background: var(--surface); border: 1.5px solid var(--border);
+    border-radius: 14px; padding: 22px;
+  }
+  .demo-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 14px; align-items: stretch; }
+  @media (max-width: 720px){ .demo-row { grid-template-columns: 1fr; } }
+  .rec {
+    background: var(--surface-2); border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 14px; font-size: 13px;
+  }
+  .rec .tag { font-family: var(--mono); font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+  .rec .name { font-family: var(--serif); font-size: 18px; color: var(--ink-strong); margin: 4px 0 8px; }
+  .rec table { width: 100%; border-collapse: collapse; }
+  .rec td { padding: 3px 0; font-size: 12.5px; vertical-align: top; }
+  .rec td:first-child { color: var(--muted); width: 38%; }
+  .match-line {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    font-family: var(--mono); font-size: 11px; color: var(--muted);
+  }
+  .score-ring {
+    width: 86px; height: 86px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--serif); font-size: 24px; color: #fff; font-weight: 500;
+    margin-bottom: 6px; transition: background .4s, transform .3s;
+  }
+  .demo-controls { margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  button.act {
+    background: var(--accent); color: #fff; border: none; border-radius: 9px;
+    padding: 9px 16px; font-size: 13.5px; cursor: pointer; font-family: var(--sans);
+  }
+  button.act:hover { background: var(--clay-dim); }
+  button.ghost {
+    background: transparent; color: var(--ink); border: 1.5px solid var(--border);
+    border-radius: 9px; padding: 9px 16px; font-size: 13.5px; cursor: pointer;
+  }
+  button.ghost:hover { border-color: var(--accent); }
+  .verdict { font-size: 14px; margin-top: 12px; padding: 10px 14px; border-radius: 9px; background: var(--surface-2); }
+
+  /* timeline */
+  .tl { display: flex; flex-direction: column; gap: 0; }
+  .tl-block {
+    display: grid; grid-template-columns: 92px 1fr; gap: 18px;
+    padding: 16px 0; border-top: 1.5px solid var(--border);
+  }
+  .tl-block:first-child { border-top: none; }
+  .tl-time { font-family: var(--mono); font-size: 13px; color: var(--accent); padding-top: 2px; }
+  .tl-who { font-family: var(--mono); font-size: 11px; }
+  .who-a { color: #5b8def; } .who-b { color: var(--olive); } .who-c { color: var(--rust); } .who-all{ color: var(--muted); }
+  .tl-body h4 { font-size: 15px; color: var(--ink-strong); margin-bottom: 3px; }
+  .tl-body p { font-size: 13.5px; color: var(--ink); }
+
+  /* criteria table */
+  table.crit { width: 100%; border-collapse: collapse; font-size: 14px; }
+  table.crit th, table.crit td { text-align: left; padding: 12px 14px; border-bottom: 1.5px solid var(--border); vertical-align: top; }
+  table.crit th { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+  table.crit td:first-child { font-weight: 600; color: var(--ink-strong); width: 22%; }
+
+  /* arch flow */
+  .flow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 8px 0; }
+  .node {
+    background: var(--surface-2); border: 1.5px solid var(--border); border-radius: 10px;
+    padding: 10px 14px; font-size: 13px; text-align: center; min-width: 120px;
+  }
+  .node b { display: block; color: var(--ink-strong); font-size: 13.5px; }
+  .node small { color: var(--muted); font-size: 11.5px; }
+  .arrow { color: var(--accent); font-size: 18px; }
+  .node.hi { border-color: var(--accent); background: var(--oat); }
+
+  a.jump { color: var(--accent); text-decoration: none; }
+  a.jump:hover { text-decoration: underline; }
+  .footer { font-size: 12.5px; color: var(--muted); border-top: 1.5px solid var(--border); padding-top: 18px; margin-top: 40px; }
+  hr.soft { border: none; border-top: 1.5px dashed var(--border); margin: 18px 0; }
+  code { font-family: var(--mono); font-size: 12.5px; background: var(--surface-2); padding: 1px 6px; border-radius: 5px; }
+</style>
+</head>
+<body>
+<button class="toggle" onclick="toggleTheme()"><span id="tIcon">◐</span> <span id="tLbl">theme</span></button>
+
+<div class="page">
+
+  <header class="page-head">
+    <div class="eyebrow">Claude Impact Lab · Mumbai 2026 · Build Plan</div>
+    <h1>Setu — सेतु</h1>
+    <div class="h1-sub">a bridge between every lost-and-found center at the Kumbh Mela</div>
+    <p class="lede">
+      The data brief is blunt about the real failure: there is <b>no cross-search between centers</b>.
+      A grandfather found and registered at Adgaon is invisible to his daughter searching at Ramkund.
+      With 80M+ pilgrims and thousands separated daily — mostly elderly, rural, multilingual, often
+      phoneless — the fix is not an app for pilgrims. It is <b>one shared registry plus a fuzzy matcher</b>,
+      run by the volunteers already staffing the Kho-Ya-Paya kendras, that works <b>offline</b> and is
+      <b>privacy-safe by design</b>.
+    </p>
+    <div class="prompt-box">
+      <span class="label">Original prompt</span>
+      Brainstorm a solution for missing persons at Kumbh Mela 2027. 3 teammates, 5 hours to build &amp; deploy,
+      Claude in the loop. Real people: many have no phone, many are elderly, many speak different languages.
+      Use the provided data. Judge on deployability, real-world fit, UX, system design, responsible data.
+    </div>
+  </header>
+
+  <div class="summary">
+    <div class="cell"><div class="k">80M<small>+</small></div><div class="v">pilgrims; 2,408 cases in one 2015 Nashik mela</div></div>
+    <div class="cell"><div class="k">10</div><div class="v">separate centers in the data, none cross-searching today</div></div>
+    <div class="cell"><div class="k">8<small>%</small></div><div class="v">same person reported at multiple centers — the dedup problem</div></div>
+    <div class="cell"><div class="k">11<small>+</small></div><div class="v">languages; 15% of records have no name, 20% no mobile</div></div>
+  </div>
+
+  <!-- 1. THE REAL PROBLEM -->
+  <section id="problem">
+    <div class="sec-head"><span class="num">01</span><h2>The failure we are actually fixing</h2></div>
+    <p class="sec-intro">
+      Plenty of teams will build "a missing-person app." That misreads who the at-risk person is.
+      We anchor on three uncomfortable truths about Kumbh and rural India — they decide the whole design.
+    </p>
+
+    <div class="persona">
+      <b>The missing person usually cannot help themselves.</b> The largest group is the <b>61–70 age band</b>
+      (and many older). Records say it plainly: <i>"cannot remember name," "hard of hearing," "cannot speak properly,"
+      "keeps asking for Ramkund."</i> They will not pull out a phone. Many never owned one. A solution that
+      starts with the lost person's smartphone helps almost no one who is actually lost.
+    </div>
+    <div class="persona">
+      <b>The family searching is panicked, often non-literate, and speaks another language.</b> Hindi, Kannada,
+      Bengali, Maithili, Telugu, Tamil, Marathi… spread almost evenly. They go counter-by-counter, on foot,
+      describing a person in their own tongue to a volunteer who may not share it.
+    </div>
+    <div class="persona">
+      <b>The infrastructure that exists is human, not digital.</b> The data hands us the real assets:
+      <b>kendras</b> (lost-found centers), <b>14 police stations</b>, <b>1,280 CCTV cameras</b> across 32 zones,
+      and <b>85 chokepoints / transfer nodes / parking belts</b> — exactly where crowds crush and families split.
+      Networks collapse near the ghats on snan days. So the system must ride on the <b>volunteer at the desk</b>
+      and survive with no signal.
+    </div>
+    <div class="card" style="margin-top:16px;border-color:var(--accent)">
+      <h3>One-line thesis</h3>
+      <p style="margin:0">
+        Build the <b>shared spine</b> the kendras lack: an offline-first registry where any "lost" report and any
+        "found" person are matched across <i>all</i> centers by a tolerant matcher that handles missing names,
+        wrong spellings, and 11 languages — so a reunion that takes days of walking happens in minutes.
+      </p>
+    </div>
+  </section>
+
+  <!-- 2. WHAT WE BUILD -->
+  <section id="build">
+    <div class="sec-head"><span class="num">02</span><h2>What we build: Setu</h2></div>
+    <p class="sec-intro">An operator-mediated kiosk + a shared matching brain. Three surfaces, one core.</p>
+
+    <div class="grid-3">
+      <div class="card">
+        <h3>① Volunteer Console</h3>
+        <p>A tablet/laptop PWA at every kendra. Two big buttons: <b>I lost someone</b> / <b>I found someone</b>.
+        Voice-first intake in the family's language, auto-transcribed &amp; translated. Photo capture if a found
+        person is present.</p>
+        <span class="pill on">offline PWA</span><span class="pill on">voice + photo</span><span class="pill on">multilingual</span>
+      </div>
+      <div class="card">
+        <h3>② Match Engine</h3>
+        <p>Every new record is scored against the opposite pool (lost ↔ found) across all centers. Tolerant of
+        blanks, phonetic name variants, age-band, gender, language, last-seen zone &amp; time window. Surfaces a
+        ranked shortlist with reasons.</p>
+        <span class="pill on">fuzzy / phonetic</span><span class="pill on">cross-center</span><span class="pill warn">human confirms</span>
+      </div>
+      <div class="card">
+        <h3>③ Ops Map</h3>
+        <p>Live map of cases over the 32 zones, CCTV coverage, chokepoints &amp; nearest police station. Shows
+        where separations cluster so help-points and announcements can be pushed before the surge.</p>
+        <span class="pill on">zone heatmap</span><span class="pill on">routing</span><span class="pill on">hotspot predict</span>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:8px">
+      <h3>How a reunion flows</h3>
+      <div class="flow">
+        <div class="node"><b>Family reports</b><small>voice, any language</small></div>
+        <span class="arrow">→</span>
+        <div class="node"><b>Volunteer console</b><small>structured record</small></div>
+        <span class="arrow">→</span>
+        <div class="node hi"><b>Match engine</b><small>scores all "found" across centers</small></div>
+        <span class="arrow">→</span>
+        <div class="node"><b>Shortlist + reasons</b><small>shown to both desks</small></div>
+        <span class="arrow">→</span>
+        <div class="node"><b>Human confirms</b><small>reunion / route to police</small></div>
+      </div>
+      <p class="muted-note" style="margin-top:8px">The machine never auto-reunites. It ranks; a trained volunteer decides. That is both safer and the right privacy posture.</p>
+    </div>
+  </section>
+
+  <!-- 3. INTERACTIVE MATCH DEMO -->
+  <section id="demo">
+    <div class="sec-head"><span class="num">03</span><h2>The core, made tangible</h2></div>
+    <p class="sec-intro">
+      This is the whole product in one screen. Left = a "lost" report filed by a panicked family at Ramkund.
+      Right = a "found" elderly man logged by a volunteer at Adgaon, 4km away. Today these two never meet.
+      Press <b>Run match</b> to see what Setu would surface — note it works even with a missing name and a different language label.
+    </p>
+
+    <div class="demo">
+      <div class="demo-row">
+        <div class="rec">
+          <div class="tag">LOST · filed at Ramkund Kendra</div>
+          <div class="name" id="lostName">Ram— (name unsure)</div>
+          <table>
+            <tr><td>Gender</td><td>Male</td></tr>
+            <tr><td>Age band</td><td>71–80</td></tr>
+            <tr><td>Language</td><td>Bhojpuri</td></tr>
+            <tr><td>Last seen</td><td>near Ramkund ghat</td></tr>
+            <tr><td>Description</td><td>white kurta, grey hair, hard of hearing</td></tr>
+            <tr><td>Reported</td><td>09:40, Amrit Snan day</td></tr>
+          </table>
+        </div>
+
+        <div class="match-line">
+          <div class="score-ring" id="ring" style="background:var(--gray-300)">—</div>
+          <div id="ringLbl">not run</div>
+        </div>
+
+        <div class="rec">
+          <div class="tag">FOUND · logged at Adgaon Kho-Ya-Paya</div>
+          <div class="name">Unknown male</div>
+          <table>
+            <tr><td>Gender</td><td>Male</td></tr>
+            <tr><td>Age (est.)</td><td>~75</td></tr>
+            <tr><td>Language</td><td>Hindi / Bhojpuri</td></tr>
+            <tr><td>Found at</td><td>Zone 7 transfer node</td></tr>
+            <tr><td>Description</td><td>elderly, white clothes, grey hair, repeating "Ramkund"</td></tr>
+            <tr><td>Logged</td><td>11:15, same day</td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div class="demo-controls">
+        <button class="act" onclick="runMatch()">Run match</button>
+        <button class="ghost" onclick="resetMatch()">Reset</button>
+        <span class="muted-note" id="hint">tip: the name is missing on the found record — most systems would never connect these two.</span>
+      </div>
+      <div class="verdict" id="verdict" style="display:none"></div>
+    </div>
+
+    <div class="card" style="margin-top:16px">
+      <h3>What the score is actually made of</h3>
+      <ul class="clean">
+        <li><b>Phonetic / fuzzy name</b> (Soundex-style + edit distance) so <i>Ram, Raam, Rama</i> collapse together; skipped gracefully when blank.</li>
+        <li><b>Hard filters</b> gender + age-band overlap — cheap, cuts the pool fast.</li>
+        <li><b>Spatio-temporal plausibility</b> last-seen zone vs found zone, walkable in the time gap (32 zone centroids + <code>Area_Boundaries.geojson</code> polygons + 21 ghat/transit sub-areas for landmark resolution).</li>
+        <li><b>Description embedding</b> "white clothes / grey hair / asking for Ramkund" matched semantically with a pre-trained multilingual model — <i>not</i> trained from scratch, per the brief.</li>
+        <li><b>Duplicate detection</b> same logic flags the 8% of records that are the same person across centers, cleaning the registry as it grows.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 4. SYSTEM DESIGN -->
+  <section id="system">
+    <div class="sec-head"><span class="num">04</span><h2>System design — offline &amp; messy by default</h2></div>
+    <p class="sec-intro">The brief grades offline survival and dirty-data handling. We design for both first, not as an afterthought.</p>
+    <div class="grid-2">
+      <div class="card">
+        <h3>Offline-first, sync-when-you-can</h3>
+        <ul class="clean">
+          <li>Each console is a PWA backed by <b>PouchDB</b> in the browser. It works fully with zero signal.</li>
+          <li>PouchDB ↔ <b>CouchDB</b> (on a kendra box) replicate continuously — multi-master, revision-based conflict handling built in. No hand-rolled sync layer.</li>
+          <li>When signal returns, every console converges automatically; the <b>rules engine</b> scores on-device offline, and Claude re-scores the semantic/language fields once back online.</li>
+          <li>Fallback for total blackout: printed QR "case cards" a runner physically carries between kendras.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Messy / incomplete data</h3>
+        <ul class="clean">
+          <li>No required name or mobile — the matcher down-weights, never blocks. (15% no name, 20% no mobile in the data.)</li>
+          <li>Free-text descriptions normalized via the LLM into structured tags at intake.</li>
+          <li>Language is a signal, not a barrier: store original + English; match across both.</li>
+          <li>Duplicate-aware: 8% cross-center dupes are detected and merged, not double-counted.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card">
+      <h3>Architecture (deliberately boring = deployable)</h3>
+      <div class="flow">
+        <div class="node"><b>Console PWA</b><small>React + PouchDB</small></div>
+        <span class="arrow">↔</span>
+        <div class="node hi"><b>CouchDB</b><small>kendra box · multi-master sync</small></div>
+        <span class="arrow">→</span>
+        <div class="node"><b>Rules engine</b><small>JS · config-driven · offline</small></div>
+        <span class="arrow">→</span>
+        <div class="node"><b>LlmBackend</b><small>Claude now · local LLM later</small></div>
+      </div>
+      <p class="muted-note" style="margin-top:8px">PouchDB/CouchDB give real offline-first replication for free — the 2-tab "two centers" sync is the DB's native mode, not bolted on. A <b>config-driven rules engine</b> does the deterministic scoring on-device (always available, even offline). The <b>LlmBackend</b> is a swappable interface: Claude does the language-heavy lifting now (transcribe→translate→structure→explain a match, semantic description overlap); a local LLM drops into the same interface later for fully on-box, no-internet operation. No GPU, no model training.</p>
+    </div>
+  </section>
+
+  <!-- 4b. CONFIGURABLE AI ENGINE -->
+  <section id="config">
+    <div class="sec-head"><span class="num">4b</span><h2>The AI is fully configurable</h2></div>
+    <p class="sec-intro">
+      No scoring weight, threshold, or rule is hard-coded. Every knob lives in one <b>config document in CouchDB</b>
+      that replicates to every console — edit once, applies everywhere, available offline. Both the rules engine
+      and the LLM prompt read from it, so the system tunes without a redeploy.
+    </p>
+    <div class="grid-2">
+      <div class="card">
+        <h3>What's tunable</h3>
+        <ul class="clean">
+          <li><b>Field weights</b> — age, gender, state, description, location, time, name point values.</li>
+          <li><b>Confidence bands</b> — HIGH / MEDIUM / LOW cutoffs + the minimum score to return.</li>
+          <li><b>Cluster rules</b> — open-cases threshold &amp; radius that mark a chokepoint zone "danger" (Mode C); tie-break by <code>risk_level</code>.</li>
+          <li><b>Escalation rules</b> — child age ceiling, hours-open trigger, duplicate-count trigger.</li>
+          <li><b>Adjacency</b> — which age-bands and zones count as "adjacent" for partial credit.</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Why it matters here</h3>
+        <ul class="clean">
+          <li><b>One source of truth</b> — rules engine (offline) and Claude (online) score identically; no drift.</li>
+          <li><b>Field-tunable</b> — ops can dial sensitivity on a snan-day surge without a developer.</li>
+          <li><b>Auditable &amp; responsible</b> — the scoring policy is data, versioned in CouchDB, reviewable.</li>
+          <li><b>Future-proof</b> — same config feeds the local-LLM backend when it replaces Claude.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="card" style="border-color:var(--accent)">
+      <h3>The config doc (replicated to every console)</h3>
+      <pre style="font-family:var(--mono);font-size:12.5px;color:var(--ink);white-space:pre-wrap;margin:0;line-height:1.5">{
+  "_id": "config:scoring", "version": 3,
+  "weights":   { "age": 25, "gender": 20, "state": 20, "description": 20,
+                 "location": 10, "time": 5, "nameExact": 10, "namePhonetic": 5 },
+  "scoreCap":  100,
+  "bands":     { "high": 75, "medium": 50, "low": 30 },
+  "timeWindowHours": 6,
+  "adjacency": { "ageBands": [["41-60","61-70"],["61-70","71-80"],["71-80","80+"]] },
+  "cluster":   { "minOpenCases": 3, "radiusMeters": 300, "trafficChokepointsOnly": true },
+  "escalation":{ "childAgeMax": 12, "childHours": 2, "unresolvedHours": 6, "dupReports": 3 },
+  "llm":       { "backend": "claude", "model": "claude-opus-4-8",
+                 "useFor": ["transcribe","translate","structure","semanticDescription","explain"],
+                 "languages": ["en","hi","mr"] }
+}</pre>
+      <p class="muted-note" style="margin-top:8px">Swap <code>"backend": "claude"</code> → <code>"local"</code> in the future and nothing else changes. Offline, the rules engine reads <code>weights/bands/adjacency</code> directly; the <code>description</code> points are filled in by the LlmBackend when reachable.</p>
+    </div>
+  </section>
+
+  <!-- 5. RESPONSIBLE DATA -->
+  <section id="privacy">
+    <div class="sec-head"><span class="num">05</span><h2>Privacy by design</h2></div>
+    <p class="sec-intro">Missing-person data is among the most sensitive there is. We treat that as a feature constraint, not a checkbox.</p>
+    <ul class="clean">
+      <li><b>Minimal collection</b> — only what helps reunite. No Aadhaar, no caste, no permanent biometric store.</li>
+      <li><b>Found-person photos are ephemeral</b> — used for the match window, auto-purged on reunion or after the mela. Never published to a public wall.</li>
+      <li><b>No public search</b> — only authenticated volunteers query. Families get results through a person, removing the trafficking/scam risk of an open lost-children database.</li>
+      <li><b>Human in the loop on every reunion</b> — the model proposes, a trained volunteer + ID check confirms before handover.</li>
+      <li><b>Consent &amp; audit</b> — every record logs who created/accessed it; data scoped to the event and deleted after.</li>
+      <li><b>Synthetic-only in the demo</b> — we ship and present on the 2,500 fake records; zero real PII touched.</li>
+    </ul>
+  </section>
+
+  <!-- 6. 5-HOUR PLAN -->
+  <section id="timeline">
+    <div class="sec-head"><span class="num">06</span><h2>The 5-hour build — 3 people + Claude</h2></div>
+    <p class="sec-intro">
+      Scope is ruthless: one killer demo path (lost ↔ found cross-center match) end-to-end, fully offline-capable,
+      on the real synthetic data. Everything else is a stretch. Roles:
+      <span class="pill" style="color:#5b8def;border-color:#5b8def">A · Data + Matcher</span>
+      <span class="pill" style="color:var(--olive);border-color:var(--olive)">B · Console UX</span>
+      <span class="pill" style="color:var(--rust);border-color:var(--rust)">C · Map + Glue + Deploy</span>
+    </p>
+    <div class="tl">
+      <div class="tl-block">
+        <div class="tl-time">0:00–0:30</div>
+        <div class="tl-body">
+          <div class="tl-who who-all">ALL</div>
+          <h4>Align &amp; freeze scope</h4>
+          <p>Lock the demo script (the Ramkund↔Adgaon reunion). Agree data schema + seed the <code>config:scoring</code> doc. Spin repo, CouchDB (local + hosted), deploy target (Vercel). Claude scaffolds the project skeleton.</p>
+        </div>
+      </div>
+      <div class="tl-block">
+        <div class="tl-time">0:30–2:00</div>
+        <div class="tl-body">
+          <div class="tl-who who-a">A — Data + Matcher</div>
+          <h4>Load CSVs, build the config-driven scorer</h4>
+          <p>Ingest 2,500 records + zones + <code>Area_Boundaries.geojson</code> + chokepoints (with <code>risk_level</code>) into CouchDB. Build the <b>rules engine</b> that reads <code>config:scoring</code> (weights/bands/adjacency) — name-phonetic + age/gender + zone-time plausibility. Wrap Claude behind <code>LlmBackend</code> for the semantic-description points. Validate it finds the 8% known dupes.</p>
+        </div>
+      </div>
+      <div class="tl-block">
+        <div class="tl-time">0:30–2:30</div>
+        <div class="tl-body">
+          <div class="tl-who who-b">B — Console UX</div>
+          <h4>Lost / Found intake PWA</h4>
+          <p>Two-button home, voice capture (Web Speech) → Claude transcribe/translate/structure. Big-type, high-contrast, icon-led for low-literacy. <b>PouchDB</b> offline store + service worker. UI strings in EN / HI / MR.</p>
+        </div>
+      </div>
+      <div class="tl-block">
+        <div class="tl-time">0:30–2:30</div>
+        <div class="tl-body">
+          <div class="tl-who who-c">C — Map + Glue</div>
+          <h4>Ops map + sync layer</h4>
+          <p>Leaflet map: 32 zone polygons from <code>Area_Boundaries.geojson</code>, 1,280 CCTV, chokepoints sized/colored by <code>risk_level</code> (26 traffic = triangles), 14 police stations. Open-case dots + cluster heatmap fed by the <b>Mode C hotspot engine</b> (<code>engine/hotspot.js</code>, already built: clusters open cases near Traffic choke-points, risk-priority tie-break, nearest police station). <b>PouchDB↔CouchDB live replication</b> across the two tabs. Nearest-police routing; point-in-polygon for vague last-seen text via <code>geo.resolveLocation</code> + curated <code>Location_Coordinates.csv</code>.</p>
+        </div>
+      </div>
+      <div class="tl-block">
+        <div class="tl-time">2:30–3:30</div>
+        <div class="tl-body">
+          <div class="tl-who who-all">ALL</div>
+          <h4>Integrate the golden path</h4>
+          <p>Console → registry → matcher → shortlist with plain-language reasons → confirm reunion. Make it work end-to-end with the network OFF, then sync back ON.</p>
+        </div>
+      </div>
+      <div class="tl-block">
+        <div class="tl-time">3:30–4:15</div>
+        <div class="tl-body">
+          <div class="tl-who who-all">ALL</div>
+          <h4>Privacy + polish + edge cases</h4>
+          <p>Auth gate, photo auto-purge, audit log. Handle blank name / blank mobile gracefully on screen. EN/HI/MR labels finalized. Offline rules-only path verified (Claude unreachable → still scores). Empty/error states.</p>
+        </div>
+      </div>
+      <div class="tl-block">
+        <div class="tl-time">4:15–5:00</div>
+        <div class="tl-body">
+          <div class="tl-who who-all">ALL</div>
+          <h4>Deploy + stress test + rehearse</h4>
+          <p>Ship to Vercel + CouchDB. Seed demo records. <b>Offline stress test</b> (network off → register 5 cases → re-enable → confirm all sync across both tabs). <b>Spike test</b> (loadAllData ×5 → search still &lt;3s). Run the 3 demo scenarios live; cut a 90s backup video.</p>
+        </div>
+      </div>
+    </div>
+    <div class="card" style="margin-top:8px;border-color:var(--rust)">
+      <h3>Cut-lines (if behind)</h3>
+      <p style="margin:0">Drop in this order: hotspot prediction (Mode C) → voice (fall back to typed + language dropdown) → map polish → live config-editing UI (config doc still works, just edited by hand). <b>Never cut:</b> the cross-center match, offline + 2-tab sync working once, and the privacy story. Those three <i>are</i> the judging criteria. (Sync is no longer a cut candidate — CouchDB gives it for free.)</p>
+    </div>
+  </section>
+
+  <!-- 7. CRITERIA MAP -->
+  <section id="criteria">
+    <div class="sec-head"><span class="num">07</span><h2>How it scores against the rubric</h2></div>
+    <table class="crit">
+      <tr><th>Criterion</th><th>How Setu wins it</th></tr>
+      <tr><td>Deployability</td><td>Boring, cheap stack (CouchDB + PouchDB PWA + Claude). Runs on one kendra box; consoles run on-device and sync peer-to-peer. Maps onto the kendras &amp; volunteers that <i>already exist</i> — no new hardware for pilgrims. LLM backend swaps Claude→local for fully offline ops.</td></tr>
+      <tr><td>Real-world fit</td><td>Targets the exact failure the brief names: no cross-center search. Designed around the actual missing person (elderly, phoneless, can't self-report) not an idealized app user.</td></tr>
+      <tr><td>UX</td><td>Operator-mediated so phoneless/non-literate elders are served by a human. Voice-in, multilingual, big-type, two-button, icon-led. Family never needs literacy or a device.</td></tr>
+      <tr><td>System design</td><td>Offline-first via PouchDB/CouchDB multi-master replication + QR runner fallback. Config-driven scoring (one replicated doc) means rules engine and LLM never drift. Tolerant of 15% no-name / 20% no-mobile; dedups the 8% cross-center duplicates. Holds &lt;3s under 5× spike.</td></tr>
+      <tr><td>Responsible data</td><td>Minimal collection, no public wall, ephemeral photos, human-confirmed reunions, full audit, synthetic-only demo. Privacy is a constraint baked into the architecture.</td></tr>
+    </table>
+  </section>
+
+  <section id="decided">
+    <div class="sec-head"><span class="num">08</span><h2>Decisions — locked</h2></div>
+    <p class="sec-intro">No open forks. The team builds against these.</p>
+    <table class="crit">
+      <tr><th>Decision</th><th>Locked choice</th></tr>
+      <tr><td>Storage + sync</td><td><b>CouchDB + PouchDB</b> — real multi-master replication; the 2-tab "two centers" demo is the DB's native mode.</td></tr>
+      <tr><td>AI backend</td><td><b>Claude now</b>, behind a swappable <code>LlmBackend</code> interface. <b>Local LLM later</b> drops into the same interface for fully on-box operation.</td></tr>
+      <tr><td>Scoring config</td><td><b>Fully configurable</b> — weights, bands, cluster &amp; escalation rules live in one <code>config:scoring</code> doc in CouchDB, replicated to every console. No hard-coded numbers.</td></tr>
+      <tr><td>Offline behavior</td><td><b>Rules engine</b> scores offline from config; Claude adds semantic + translation when online. Search never blocks.</td></tr>
+      <tr><td>Languages</td><td><b>English · Hindi · Marathi</b> (UI strings + Claude translation).</td></tr>
+      <tr><td>Demo</td><td><b>Live on stage</b> — 3 scenarios; 90s recorded backup if wifi fails.</td></tr>
+    </table>
+  </section>
+
+  <div class="footer">
+    Setu · Claude Impact Lab Mumbai 2026 · plan built on the provided synthetic dataset (2,500 records, 1,280 cameras, 32 zone polygons + 21 ghat/transit areas, 14 police stations, 85 chokepoints with risk metadata). All missing-person data is fake.
+    <br>Jump to: <a class="jump" href="#problem">problem</a> · <a class="jump" href="#build">build</a> · <a class="jump" href="#demo">demo</a> · <a class="jump" href="#system">system</a> · <a class="jump" href="#config">config</a> · <a class="jump" href="#privacy">privacy</a> · <a class="jump" href="#timeline">5-hour plan</a> · <a class="jump" href="#criteria">rubric</a> · <a class="jump" href="#decided">decisions</a>
+  </div>
+
+</div>
+
+<script>
+  function toggleTheme() {
+    var d = document.documentElement.classList.toggle('dark');
+    try { localStorage.setItem('theme', d ? 'dark' : 'light'); } catch(e){}
+    syncIcon();
+  }
+  function syncIcon() {
+    var d = document.documentElement.classList.contains('dark');
+    document.getElementById('tIcon').textContent = d ? '☾' : '☀';
+    document.getElementById('tLbl').textContent = d ? 'dark' : 'light';
+  }
+  syncIcon();
+
+  function runMatch() {
+    var ring = document.getElementById('ring');
+    var lbl = document.getElementById('ringLbl');
+    var v = document.getElementById('verdict');
+    var target = 91;
+    ring.style.background = 'var(--olive)';
+    ring.style.transform = 'scale(1.05)';
+    lbl.textContent = 'strong match';
+    var n = 0;
+    var iv = setInterval(function(){
+      n += 3;
+      if (n >= target) { n = target; clearInterval(iv); ring.style.transform = 'scale(1)'; }
+      ring.textContent = n + '%';
+    }, 22);
+    v.style.display = 'block';
+    v.innerHTML = "<b>91% — likely the same person.</b> Matched on: male + 71–80 age overlap, "
+      + "Bhojpuri language, white clothes &amp; grey hair (semantic), and “asking for Ramkund” ↔ last seen Ramkund ghat. "
+      + "Found at Zone 7 transfer node, walkable from Ramkund within the 95-min gap. "
+      + "<i>Name was blank on the found record — the match still holds. Shown to both desks; a volunteer confirms with an ID check before handover.</i>";
+  }
+  function resetMatch() {
+    var ring = document.getElementById('ring');
+    ring.style.background = 'var(--gray-300)';
+    ring.textContent = '—';
+    ring.style.transform = 'scale(1)';
+    document.getElementById('ringLbl').textContent = 'not run';
+    document.getElementById('verdict').style.display = 'none';
+  }
+</script>
+</body>
+</html>
