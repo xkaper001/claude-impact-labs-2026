@@ -1,671 +1,469 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Setu — Kumbh Mela Missing Persons · Build Plan</title>
-<script>
-  // apply theme before paint
-  (function () {
-    try {
-      var t = localStorage.getItem('theme');
-      if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-      if (t === 'dark') document.documentElement.classList.add('dark');
-    } catch (e) {}
-  })();
-</script>
-<style>
-  :root {
-    --ivory:    #FAF9F5;
-    --slate:    #141413;
-    --clay:     #D97757;
-    --clay-dim: #c4633f;
-    --oat:      #E3DACC;
-    --olive:    #788C5D;
-    --rust:     #B5503A;
-    --gray-150: #F0EEE6;
-    --gray-300: #D1CFC5;
-    --gray-500: #87867F;
-    --gray-700: #3D3D3A;
-    --white:    #FFFFFF;
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KumbhRakshak — Cross-Center Reunification at Kumbh Mela 2027</title>
 
-    --bg:       var(--ivory);
-    --surface:  var(--white);
-    --surface-2:var(--gray-150);
-    --border:   var(--gray-300);
-    --ink:      var(--gray-700);
-    --ink-strong: var(--slate);
-    --muted:    var(--gray-500);
-    --accent:   var(--clay);
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 
-    --serif: ui-serif, Georgia, 'Times New Roman', serif;
-    --sans:  system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-    --mono:  ui-monospace, 'SF Mono', Menlo, Monaco, monospace;
-  }
-  html.dark {
-    --bg:        #1a1a18;
-    --surface:   #242422;
-    --surface-2: #2d2d2a;
-    --border:    #3a3a36;
-    --ink:       #d8d6cd;
-    --ink-strong:#f4f2ec;
-    --muted:     #8f8e85;
-    --oat:       #3a352b;
-    --gray-150:  #2d2d2a;
-    --accent:    #e08a6a;
-  }
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4/dist/theme/white.css" id="theme">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@4/plugin/highlight/monokai.css">
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  <style>
+    :root{
+      --bg:#f5f6f8; --bg2:#eceff4; --panel:#ffffff; --panel-bd:#e3e7ef;
+      --ink:#243149; --head:#16284b; --muted:#6b7488;
+      --gold:#b8862f; --gold-soft:#caa14b; --navy:#16284b;
+      --green:#1e8e5a; --red:#c0392b; --blue:#2f5b9c;
+    }
+    html,body{background:var(--bg);}
+    .reveal{font-family:"Inter",system-ui,sans-serif;color:var(--ink);font-size:30px;}
+    .reveal h1,.reveal h2,.reveal h3,.reveal .kicker{font-family:"Plus Jakarta Sans",sans-serif;text-transform:none;letter-spacing:-.015em;color:var(--head);}
+    .reveal h1{font-size:2.5em;font-weight:800;line-height:1.04;}
+    .reveal h2{font-size:1.5em;font-weight:800;margin-bottom:.35em;}
+    .reveal h3{font-weight:700;}
+    .reveal .slides section{text-align:left;}
+    .reveal section.center,.reveal section.center *{text-align:center;}
+    .reveal p{line-height:1.45;}
+    .reveal .muted{color:var(--muted);}
+    .reveal a{color:var(--gold);}
+    .reveal ::selection{background:var(--gold);color:#fff;}
 
-  body {
-    font-family: var(--sans);
-    background: var(--bg);
-    color: var(--ink);
-    line-height: 1.58;
-    padding: 48px 24px 120px;
-    -webkit-font-smoothing: antialiased;
-    transition: background .25s, color .25s;
-  }
-  .page { max-width: 1080px; margin: 0 auto; }
+    /* subtle light background layer */
+    .bg-aura{position:fixed;inset:0;z-index:-1;
+      background:
+        radial-gradient(55% 45% at 100% 0%, rgba(184,134,47,.07), transparent 60%),
+        radial-gradient(55% 50% at 0% 100%, rgba(22,40,75,.05), transparent 60%),
+        var(--bg);}
 
-  /* theme toggle */
-  .toggle {
-    position: fixed; top: 18px; right: 18px; z-index: 50;
-    background: var(--surface); border: 1.5px solid var(--border);
-    color: var(--ink); border-radius: 10px; padding: 8px 12px;
-    font-family: var(--mono); font-size: 12px; cursor: pointer;
-    display: flex; align-items: center; gap: 7px;
-  }
-  .toggle:hover { border-color: var(--accent); color: var(--ink-strong); }
+    .reveal .kicker{color:var(--gold);font-size:.46em;font-weight:800;letter-spacing:.2em;text-transform:uppercase;margin:0 0 .55em;}
+    /* thin gold rule under the kicker via headline */
+    .reveal .grad{color:var(--gold);}
+    .reveal .lead{font-size:1.1em;color:var(--ink);}
+    .reveal .deck{color:var(--muted);font-size:.64em;line-height:1.6;}
 
-  /* header */
-  header.page-head { margin-bottom: 44px; max-width: 860px; }
-  .eyebrow {
-    font-size: 12px; letter-spacing: .09em; text-transform: uppercase;
-    color: var(--muted); margin-bottom: 14px; font-family: var(--mono);
-  }
-  h1 {
-    font-family: var(--serif); font-weight: 500; font-size: 42px;
-    line-height: 1.12; color: var(--ink-strong); margin-bottom: 6px;
-    letter-spacing: -0.015em;
-  }
-  .h1-sub { font-family: var(--serif); font-style: italic; font-size: 20px; color: var(--accent); margin-bottom: 20px; }
-  .lede { font-size: 16.5px; color: var(--ink); max-width: 760px; }
-  .lede b { color: var(--ink-strong); }
+    .reveal .grid2{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:center;}
+    .reveal .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+    .reveal .grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;}
+    .reveal .v-center{align-items:center;}
 
-  .prompt-box {
-    background: var(--surface-2); border: 1.5px solid var(--border);
-    border-radius: 12px; padding: 14px 18px; font-size: 14px;
-    color: var(--ink); margin-top: 22px;
-  }
-  .prompt-box .label {
-    font-family: var(--mono); font-size: 11px; text-transform: uppercase;
-    letter-spacing: .06em; color: var(--muted); display: block; margin-bottom: 6px;
-  }
+    .reveal .card{background:var(--panel);border:1px solid var(--panel-bd);border-radius:14px;padding:22px 24px;
+      box-shadow:0 6px 22px rgba(22,40,75,.06);border-top:3px solid var(--navy);}
+    .reveal .card h3{font-size:.8em;margin:0 0 .5em;color:var(--head);}
+    .reveal .card.s{border-top-color:var(--gold);}
+    .reveal .card.t{border-top-color:var(--blue);}
+    .reveal .card.r{border-top-color:var(--red);}
+    .reveal .card .ico{font-size:1.3em;}
 
-  /* summary strip */
-  .summary {
-    display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px;
-    margin: 36px 0 60px;
-  }
-  @media (max-width: 820px) { .summary { grid-template-columns: repeat(2, 1fr); } }
-  .summary .cell {
-    background: var(--surface); border: 1.5px solid var(--border);
-    border-radius: 12px; padding: 16px 16px;
-  }
-  .summary .k { font-family: var(--serif); font-size: 28px; color: var(--ink-strong); line-height: 1.1; }
-  .summary .k small { font-size: 15px; color: var(--accent); }
-  .summary .v { font-size: 12.5px; color: var(--muted); margin-top: 4px; }
+    .reveal .stat{text-align:center;}
+    .reveal .stat .num{font-family:"Plus Jakarta Sans";font-weight:800;font-size:2.7em;line-height:1;color:var(--navy);}
+    .reveal .stat .num.g{color:var(--gold);}
+    .reveal .stat .lab{color:var(--muted);font-size:.54em;margin-top:.5em;letter-spacing:.04em;font-weight:600;}
 
-  /* sections */
-  section { margin-bottom: 60px; scroll-margin-top: 24px; }
-  .sec-head { display: flex; align-items: baseline; gap: 13px; margin-bottom: 10px; }
-  .sec-head .num {
-    font-family: var(--mono); font-size: 12px; background: var(--oat);
-    color: var(--ink-strong); padding: 3px 9px; border-radius: 8px;
-  }
-  .sec-head h2 {
-    font-family: var(--serif); font-weight: 500; font-size: 27px;
-    color: var(--ink-strong); letter-spacing: -0.01em;
-  }
-  .sec-intro { font-size: 14.5px; color: var(--muted); max-width: 740px; margin-bottom: 26px; }
+    .reveal .pill{display:inline-block;border-radius:999px;padding:5px 16px;font-size:.48em;font-weight:700;margin:4px 4px 0 0;
+      background:rgba(184,134,47,.12);color:#8a6420;border:1px solid rgba(184,134,47,.4);}
+    .reveal .pill.t{background:rgba(22,40,75,.08);color:var(--navy);border-color:rgba(22,40,75,.25);}
 
-  .card {
-    background: var(--surface); border: 1.5px solid var(--border);
-    border-radius: 14px; padding: 22px 24px; margin-bottom: 16px;
-  }
-  .card h3 { font-family: var(--serif); font-weight: 500; font-size: 19px; color: var(--ink-strong); margin-bottom: 8px; }
-  .card p { font-size: 14.5px; margin-bottom: 10px; }
-  .card p:last-child { margin-bottom: 0; }
+    .reveal table{font-size:.6em;border-collapse:collapse;width:100%;}
+    .reveal th{color:var(--head);font-weight:800;text-align:left;border-bottom:2px solid var(--gold);padding:8px 10px;}
+    .reveal td{border:none;border-bottom:1px solid var(--panel-bd);padding:8px 10px;color:var(--ink);}
+    .reveal .yes{color:var(--green);font-weight:700;}
+    .reveal .no{color:var(--red);font-weight:700;}
 
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
-  @media (max-width: 820px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+    .reveal pre{width:100%;box-shadow:0 8px 26px rgba(22,40,75,.14);margin:0;border-radius:14px;overflow:hidden;}
+    .reveal pre code{font-family:"JetBrains Mono",monospace;background:#16284b;padding:20px 22px;font-size:.78em;line-height:1.5;}
 
-  .pill {
-    display: inline-block; font-family: var(--mono); font-size: 11px;
-    padding: 2px 8px; border-radius: 20px; border: 1px solid var(--border);
-    color: var(--muted); margin: 0 4px 4px 0;
-  }
-  .pill.on { background: var(--olive); color: #fff; border-color: var(--olive); }
-  .pill.warn { background: var(--rust); color: #fff; border-color: var(--rust); }
+    .chart-wrap{position:relative;width:100%;}
+    .chart-wrap.h420{height:420px;} .chart-wrap.h360{height:360px;} .chart-wrap.h300{height:300px;}
 
-  ul.clean { list-style: none; }
-  ul.clean li { position: relative; padding-left: 20px; font-size: 14.5px; margin-bottom: 7px; }
-  ul.clean li::before { content: "→"; position: absolute; left: 0; color: var(--accent); }
+    .reveal .pipe{display:flex;align-items:stretch;gap:10px;margin-top:24px;}
+    .reveal .pipe .step{flex:1;background:var(--panel);border:1px solid var(--panel-bd);border-radius:12px;padding:16px 10px;text-align:center;font-size:.54em;color:var(--muted);box-shadow:0 4px 14px rgba(22,40,75,.05);}
+    .reveal .pipe .step b{display:block;font-family:"Plus Jakarta Sans";font-weight:800;font-size:1.5em;margin-bottom:4px;color:var(--gold);}
+    .reveal .pipe .arrow{display:flex;align-items:center;color:var(--gold);font-size:1.3em;}
 
-  .muted-note { font-size: 13px; color: var(--muted); font-style: italic; }
-
-  /* the "why people are different" callout */
-  .persona {
-    border-left: 3px solid var(--accent); background: var(--surface-2);
-    padding: 14px 18px; border-radius: 0 10px 10px 0; margin-bottom: 12px;
-  }
-  .persona b { color: var(--ink-strong); }
-
-  /* interactive matcher demo */
-  .demo {
-    background: var(--surface); border: 1.5px solid var(--border);
-    border-radius: 14px; padding: 22px;
-  }
-  .demo-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 14px; align-items: stretch; }
-  @media (max-width: 720px){ .demo-row { grid-template-columns: 1fr; } }
-  .rec {
-    background: var(--surface-2); border: 1.5px solid var(--border);
-    border-radius: 10px; padding: 14px; font-size: 13px;
-  }
-  .rec .tag { font-family: var(--mono); font-size: 10.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
-  .rec .name { font-family: var(--serif); font-size: 18px; color: var(--ink-strong); margin: 4px 0 8px; }
-  .rec table { width: 100%; border-collapse: collapse; }
-  .rec td { padding: 3px 0; font-size: 12.5px; vertical-align: top; }
-  .rec td:first-child { color: var(--muted); width: 38%; }
-  .match-line {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    font-family: var(--mono); font-size: 11px; color: var(--muted);
-  }
-  .score-ring {
-    width: 86px; height: 86px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--serif); font-size: 24px; color: #fff; font-weight: 500;
-    margin-bottom: 6px; transition: background .4s, transform .3s;
-  }
-  .demo-controls { margin-top: 18px; display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-  button.act {
-    background: var(--accent); color: #fff; border: none; border-radius: 9px;
-    padding: 9px 16px; font-size: 13.5px; cursor: pointer; font-family: var(--sans);
-  }
-  button.act:hover { background: var(--clay-dim); }
-  button.ghost {
-    background: transparent; color: var(--ink); border: 1.5px solid var(--border);
-    border-radius: 9px; padding: 9px 16px; font-size: 13.5px; cursor: pointer;
-  }
-  button.ghost:hover { border-color: var(--accent); }
-  .verdict { font-size: 14px; margin-top: 12px; padding: 10px 14px; border-radius: 9px; background: var(--surface-2); }
-
-  /* timeline */
-  .tl { display: flex; flex-direction: column; gap: 0; }
-  .tl-block {
-    display: grid; grid-template-columns: 92px 1fr; gap: 18px;
-    padding: 16px 0; border-top: 1.5px solid var(--border);
-  }
-  .tl-block:first-child { border-top: none; }
-  .tl-time { font-family: var(--mono); font-size: 13px; color: var(--accent); padding-top: 2px; }
-  .tl-who { font-family: var(--mono); font-size: 11px; }
-  .who-a { color: #5b8def; } .who-b { color: var(--olive); } .who-c { color: var(--rust); } .who-all{ color: var(--muted); }
-  .tl-body h4 { font-size: 15px; color: var(--ink-strong); margin-bottom: 3px; }
-  .tl-body p { font-size: 13.5px; color: var(--ink); }
-
-  /* criteria table */
-  table.crit { width: 100%; border-collapse: collapse; font-size: 14px; }
-  table.crit th, table.crit td { text-align: left; padding: 12px 14px; border-bottom: 1.5px solid var(--border); vertical-align: top; }
-  table.crit th { font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
-  table.crit td:first-child { font-weight: 600; color: var(--ink-strong); width: 22%; }
-
-  /* arch flow */
-  .flow { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 8px 0; }
-  .node {
-    background: var(--surface-2); border: 1.5px solid var(--border); border-radius: 10px;
-    padding: 10px 14px; font-size: 13px; text-align: center; min-width: 120px;
-  }
-  .node b { display: block; color: var(--ink-strong); font-size: 13.5px; }
-  .node small { color: var(--muted); font-size: 11.5px; }
-  .arrow { color: var(--accent); font-size: 18px; }
-  .node.hi { border-color: var(--accent); background: var(--oat); }
-
-  a.jump { color: var(--accent); text-decoration: none; }
-  a.jump:hover { text-decoration: underline; }
-  .footer { font-size: 12.5px; color: var(--muted); border-top: 1.5px solid var(--border); padding-top: 18px; margin-top: 40px; }
-  hr.soft { border: none; border-top: 1.5px dashed var(--border); margin: 18px 0; }
-  code { font-family: var(--mono); font-size: 12.5px; background: var(--surface-2); padding: 1px 6px; border-radius: 5px; }
-</style>
+    .reveal .footer{position:fixed;bottom:14px;left:22px;font-size:13px;color:var(--muted);opacity:.7;font-family:"Plus Jakarta Sans";z-index:30;}
+    .reveal .progress{color:var(--gold);height:3px;}
+    .reveal .controls{color:var(--navy);}
+    .reveal .slide-number{background:transparent;color:var(--muted);font-family:"JetBrains Mono";}
+    .reveal section img{border:none;box-shadow:none;}
+    .barline{display:flex;align-items:center;gap:12px;margin:10px 0;font-size:.62em;}
+    .barline .track{flex:1;height:14px;border-radius:8px;background:rgba(22,40,75,.08);overflow:hidden;}
+    .barline .fill{height:100%;border-radius:8px;}
+    .barline .v{width:64px;text-align:right;font-family:"JetBrains Mono";color:var(--ink);}
+    .reveal .mchip{display:inline-block;font-family:"JetBrains Mono",monospace;font-size:.42em;font-weight:600;
+      background:rgba(22,40,75,.07);border:1px solid rgba(22,40,75,.16);color:var(--navy);border-radius:7px;padding:4px 9px;margin:3px 4px 0 0;}
+    .reveal .mchip.dim{background:#eef1f6;border-color:var(--panel-bd);color:var(--muted);}
+  </style>
 </head>
 <body>
-<button class="toggle" onclick="toggleTheme()"><span id="tIcon">◐</span> <span id="tLbl">theme</span></button>
+<div class="bg-aura"></div>
+<div class="reveal">
+  <div class="slides">
 
-<div class="page">
+    <!-- 1 · TITLE -->
+    <section class="center" data-auto-animate>
+      <p class="kicker" data-id="k">Nashik–Trimbakeshwar · Simhastha Kumbh Mela 2027</p>
+      <h1 data-id="t">Kumbh<span class="grad">Rakshak</span></h1>
+      <h3 class="muted" style="font-weight:500;margin-top:6px">कुंभरक्षक — the cross-center reunification engine</h3>
+      <p class="lead" style="margin-top:36px">When someone is <b class="grad">found at Center A</b>,<br>their family searching at <b class="grad">Center B</b> should see them instantly.</p>
+      <p style="margin-top:26px"><span class="pill">Offline-first</span><span class="pill">Config-driven AI scoring</span><span class="pill t">Claude-assisted</span><span class="pill t">Phoneless-friendly</span></p>
+      <aside class="notes">KumbhRakshak = "Kumbh protector." One sentence: we close the cross-center search gap so a found person registered anywhere is searchable everywhere — offline, multilingual, human-verified.</aside>
+    </section>
 
-  <header class="page-head">
-    <div class="eyebrow">Claude Impact Lab · Mumbai 2026 · Build Plan</div>
-    <h1>Setu — सेतु</h1>
-    <div class="h1-sub">a bridge between every lost-and-found center at the Kumbh Mela</div>
-    <p class="lede">
-      The data brief is blunt about the real failure: there is <b>no cross-search between centers</b>.
-      A grandfather found and registered at Adgaon is invisible to his daughter searching at Ramkund.
-      With 80M+ pilgrims and thousands separated daily — mostly elderly, rural, multilingual, often
-      phoneless — the fix is not an app for pilgrims. It is <b>one shared registry plus a fuzzy matcher</b>,
-      run by the volunteers already staffing the Kho-Ya-Paya kendras, that works <b>offline</b> and is
-      <b>privacy-safe by design</b>.
-    </p>
-    <div class="prompt-box">
-      <span class="label">Original prompt</span>
-      Brainstorm a solution for missing persons at Kumbh Mela 2027. 3 teammates, 5 hours to build &amp; deploy,
-      Claude in the loop. Real people: many have no phone, many are elderly, many speak different languages.
-      Use the provided data. Judge on deployability, real-world fit, UX, system design, responsible data.
-    </div>
-  </header>
+    <!-- 2 · SCALE -->
+    <section data-auto-animate>
+      <p class="kicker">The setting</p>
+      <h2>The largest human gathering on Earth</h2>
+      <div class="grid3" style="margin-top:34px">
+        <div class="stat"><div class="num g">80M+</div><div class="lab">PILGRIMS OVER THE MELA</div></div>
+        <div class="stat"><div class="num g">1000s</div><div class="lab">GO MISSING — EVERY DAY</div></div>
+        <div class="stat"><div class="num g">4–5×</div><div class="lab">CASE SPIKE ON SNAN DAYS</div></div>
+      </div>
+      <p class="lead muted" style="margin-top:38px;text-align:center">Most of the missing are <b style="color:var(--ink)">elderly, rural, multilingual pilgrims</b> — frequently with no phone.</p>
+      <aside class="notes">Scale is the problem. The bottleneck isn't goodwill — it's that the lost-and-found centers don't connect to each other.</aside>
+    </section>
 
-  <div class="summary">
-    <div class="cell"><div class="k">80M<small>+</small></div><div class="v">pilgrims; 2,408 cases in one 2015 Nashik mela</div></div>
-    <div class="cell"><div class="k">10</div><div class="v">separate centers in the data, none cross-searching today</div></div>
-    <div class="cell"><div class="k">8<small>%</small></div><div class="v">same person reported at multiple centers — the dedup problem</div></div>
-    <div class="cell"><div class="k">11<small>+</small></div><div class="v">languages; 15% of records have no name, 20% no mobile</div></div>
-  </div>
+    <!-- 3 · WHO GOES MISSING (age chart) -->
+    <section>
+      <p class="kicker">Who goes missing · 2,500-record dataset</p>
+      <h2>It skews <span class="grad">elderly</span></h2>
+      <div class="grid2 v-center">
+        <div class="chart-wrap h420"><canvas id="cAge" data-chart></canvas></div>
+        <div>
+          <div class="stat" style="text-align:left"><div class="num g" style="font-size:2.2em">28%</div><div class="lab" style="font-size:.6em">of all cases are aged <b style="color:var(--ink)">61–70</b> — the single largest group</div></div>
+          <p class="lead" style="margin-top:24px"><b>1 in 2</b> missing persons is over 60. They're the hardest to match: <span class="muted">vague descriptions, can't recall their own name, no device.</span></p>
+        </div>
+      </div>
+      <aside class="notes">61–70 is the biggest band by far (697 of 2,500). Add 71–80 and 80+ and the elderly dominate. This shapes the whole scoring model: we must match on origin-state and clothing, not on a name or a phone.</aside>
+    </section>
 
-  <!-- 1. THE REAL PROBLEM -->
-  <section id="problem">
-    <div class="sec-head"><span class="num">01</span><h2>The failure we are actually fixing</h2></div>
-    <p class="sec-intro">
-      Plenty of teams will build "a missing-person app." That misreads who the at-risk person is.
-      We anchor on three uncomfortable truths about Kumbh and rural India — they decide the whole design.
-    </p>
+    <!-- 4 · OUTCOME GAP (status doughnut) -->
+    <section>
+      <p class="kicker">The outcome today</p>
+      <h2>86% reunite — but the system is <span style="color:var(--red)">blind across centers</span></h2>
+      <div class="grid2 v-center">
+        <div class="chart-wrap h360"><canvas id="cStatus" data-chart></canvas></div>
+        <div>
+          <p class="lead"><b style="color:var(--red)">350 of 2,500</b> are still pending, unresolved, or in hospital at last record.</p>
+          <p style="margin-top:18px;font-size:.78em" class="muted">A found person at one center stays <b style="color:var(--ink)">invisible</b> to a family at another. The match often <em>already exists</em> in the data — and nobody can see it.</p>
+        </div>
+      </div>
+      <aside class="notes">86% reunification sounds fine until you see it's despite no cross-center search — driven by PA announcements and luck. The 350 are exactly the cases a cross-center matcher targets.</aside>
+    </section>
 
-    <div class="persona">
-      <b>The missing person usually cannot help themselves.</b> The largest group is the <b>61–70 age band</b>
-      (and many older). Records say it plainly: <i>"cannot remember name," "hard of hearing," "cannot speak properly,"
-      "keeps asking for Ramkund."</i> They will not pull out a phone. Many never owned one. A solution that
-      starts with the lost person's smartphone helps almost no one who is actually lost.
-    </div>
-    <div class="persona">
-      <b>The family searching is panicked, often non-literate, and speaks another language.</b> Hindi, Kannada,
-      Bengali, Maithili, Telugu, Tamil, Marathi… spread almost evenly. They go counter-by-counter, on foot,
-      describing a person in their own tongue to a volunteer who may not share it.
-    </div>
-    <div class="persona">
-      <b>The infrastructure that exists is human, not digital.</b> The data hands us the real assets:
-      <b>kendras</b> (lost-found centers), <b>14 police stations</b>, <b>1,280 CCTV cameras</b> across 32 zones,
-      and <b>85 chokepoints / transfer nodes / parking belts</b> — exactly where crowds crush and families split.
-      Networks collapse near the ghats on snan days. So the system must ride on the <b>volunteer at the desk</b>
-      and survive with no signal.
-    </div>
-    <div class="card" style="margin-top:16px;border-color:var(--accent)">
-      <h3>One-line thesis</h3>
-      <p style="margin:0">
-        Build the <b>shared spine</b> the kendras lack: an offline-first registry where any "lost" report and any
-        "found" person are matched across <i>all</i> centers by a tolerant matcher that handles missing names,
-        wrong spellings, and 11 languages — so a reunion that takes days of walking happens in minutes.
+    <!-- 5 · THE FAILURE -->
+    <section data-auto-animate>
+      <p class="kicker">The failure we fix</p>
+      <h2>Two centers. One person. <span class="grad">Zero connection.</span></h2>
+      <div class="grid2" style="margin-top:18px">
+        <div class="card r"><h3 class="no">⟶ CENTER A · "Found"</h3><p style="font-size:.74em">A confused elderly man arrives at the Ramkund center. No ID, can't recall his name. A volunteer files a record <em>here</em>.</p></div>
+        <div class="card r"><h3 class="no">⟵ CENTER B · "Searching"</h3><p style="font-size:.74em">3 km away his family describes him at a different center. They <b>never see</b> the record from Center A.</p></div>
+      </div>
+      <p class="lead" style="margin-top:26px;text-align:center"><b class="grad">No cross-search.</b> &nbsp;Hours pass. On a snan day, hours are dangerous.</p>
+      <aside class="notes">This is the single highest-impact gap, straight from the dataset brief. Everything we build serves closing it.</aside>
+    </section>
+
+    <!-- 6 · MESSY DATA (gaps chart) -->
+    <section>
+      <p class="kicker">Why naive matching fails</p>
+      <h2>The data is <span class="grad">incomplete by nature</span></h2>
+      <div class="grid2 v-center">
+        <div class="chart-wrap h360"><canvas id="cGaps" data-chart></canvas></div>
+        <div>
+          <p class="lead">A matcher built for clean records is useless here.</p>
+          <ul style="font-size:.74em;margin-top:14px">
+            <li><b>15%</b> have no name — must never be penalised</li>
+            <li><b>20%</b> have no phone — the at-risk group is phoneless</li>
+            <li><b>8%</b> are the same person filed across centers</li>
+          </ul>
+          <p class="muted" style="font-size:.66em;margin-top:14px">So we score on what families <em>do</em> know — origin state, age, clothing — and treat missing fields honestly, never as a mismatch.</p>
+        </div>
+      </div>
+      <aside class="notes">Incomplete data is the design constraint, not an edge case. Our engine excludes unassessable fields with a note instead of guessing or penalising.</aside>
+    </section>
+
+    <!-- 7 · SOLUTION -->
+    <section data-background-color="#eceff4">
+      <p class="kicker">Our solution</p>
+      <h2>One registry, searched <span class="grad">across every center</span></h2>
+      <div class="grid3" style="margin-top:26px">
+        <div class="card t"><div class="ico">🔄</div><h3>Unified & offline</h3><p style="font-size:.66em" class="muted">Every center shares one registry that syncs peer-to-peer. Works when the network dies near the ghats, reconciles after.</p></div>
+        <div class="card s"><div class="ico">🧠</div><h3>AI ranks, human decides</h3><p style="font-size:.66em" class="muted">A deterministic engine ranks the top matches; Claude handles language &amp; vague descriptions. The volunteer always confirms.</p></div>
+        <div class="card t"><div class="ico">🗣️</div><h3>For the real user</h3><p style="font-size:.66em" class="muted">Volunteer-operated, voice input, Hindi / Marathi / English. The family just talks.</p></div>
+      </div>
+      <p style="margin-top:26px;text-align:center"><span class="pill">A · SEARCH</span><span class="pill">B · IDENTIFY</span><span class="pill">C · HOTSPOT</span></p>
+      <aside class="notes">Two pillars: a unified offline-first registry, and AI that ranks but never decides. Human-in-the-loop is a feature.</aside>
+    </section>
+
+    <!-- 8 · PIPELINE -->
+    <section>
+      <p class="kicker">How a search runs</p>
+      <h2>2,500 records → the right 3, in <span class="grad">&lt; 0.5s</span></h2>
+      <div class="pipe">
+        <div class="step"><b>2,500</b>found-person records</div>
+        <div class="arrow">→</div>
+        <div class="step"><b>≤40</b>pre-filter<br>gender·age·state</div>
+        <div class="arrow">→</div>
+        <div class="step"><b>score</b>config-driven<br>per field</div>
+        <div class="arrow">→</div>
+        <div class="step"><b>Top-3</b>band + dup<br>+ re-report</div>
+        <div class="arrow">→</div>
+        <div class="step"><b>Claude</b>semantic +<br>explanation</div>
+      </div>
+      <p class="lead" style="margin-top:30px">The engine does the <b class="grad">scaling and deterministic fields offline</b>. Claude only ever sees ≤40 rows — and fills the one thing rules can't: vague, mixed-language descriptions.</p>
+      <p class="muted" style="font-size:.6em">Zero-dependency JavaScript — the same code runs in Node and in-browser under PouchDB.</p>
+      <aside class="notes">Pre-filter before the LLM is the deployability trick: Claude never processes 2,500 rows, so it stays fast and cheap under a 4–5× spike.</aside>
+    </section>
+
+    <!-- 9 · SCORING ENGINE -->
+    <section>
+      <p class="kicker">The matcher brain</p>
+      <h2>How a match earns its <span class="grad">100 points</span></h2>
+      <div class="grid2" style="align-items:start">
+
+        <!-- LEFT: weight allocation + band scale -->
+        <div>
+          <div class="barline"><span style="width:96px;font-weight:600">Age</span><div class="track"><div class="fill" style="width:100%;background:var(--navy)"></div></div><span class="v">25</span></div>
+          <div class="barline"><span style="width:96px;font-weight:600">Gender</span><div class="track"><div class="fill" style="width:80%;background:var(--navy)"></div></div><span class="v">20</span></div>
+          <div class="barline"><span style="width:96px;font-weight:600">State</span><div class="track"><div class="fill" style="width:80%;background:var(--navy)"></div></div><span class="v">20</span></div>
+          <div class="barline"><span style="width:96px;font-weight:600;color:#8a6420">Description</span><div class="track"><div class="fill" style="width:80%;background:var(--gold)"></div></div><span class="v">20</span></div>
+          <div class="barline"><span style="width:96px;font-weight:600">Location</span><div class="track"><div class="fill" style="width:40%;background:var(--navy)"></div></div><span class="v">10</span></div>
+          <div class="barline"><span style="width:96px;font-weight:600">Name</span><div class="track"><div class="fill" style="width:40%;background:var(--navy)"></div></div><span class="v">10/5</span></div>
+          <div class="barline"><span style="width:96px;font-weight:600">Time</span><div class="track"><div class="fill" style="width:20%;background:var(--navy)"></div></div><span class="v">5</span></div>
+
+          <p style="font-size:.46em;margin-top:14px;color:var(--muted)">
+            <span style="color:var(--navy);font-size:1.3em;vertical-align:-1px">■</span> deterministic · on-device, offline &nbsp;&nbsp;
+            <span style="color:var(--gold);font-size:1.3em;vertical-align:-1px">■</span> semantic · Claude fills this when online
+          </p>
+
+          <!-- band scale -->
+          <div style="margin-top:16px">
+            <div style="height:14px;border-radius:8px;background:linear-gradient(90deg,#d6deea 0 30%,#9aa6bd 30% 50%,#caa14b 50% 75%,#1e8e5a 75% 100%)"></div>
+            <div style="display:flex;justify-content:space-between;font-size:.4em;color:var(--muted);margin-top:5px;font-family:'JetBrains Mono'">
+              <span>0</span><span>30&nbsp;min</span><span>50&nbsp;MED</span><span>75&nbsp;HIGH</span><span>100</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: a real match card -->
+        <div>
+          <div class="card s" style="padding:18px 20px;border-top-width:4px">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <b style="font-family:'Plus Jakarta Sans';font-size:.7em;color:var(--navy)">KMP-2027-01199</b>
+              <span style="background:rgba(30,142,90,.14);color:#1e8e5a;border:1px solid rgba(30,142,90,.4);border-radius:999px;padding:4px 13px;font-size:.46em;font-weight:800">HIGH · 75 / 100</span>
+            </div>
+            <p class="muted" style="font-size:.5em;margin:8px 0 4px">Male · 71–80 · Bihar · Ramkund Ghat · Police Main Control Room</p>
+            <div style="margin-top:8px">
+              <span class="mchip">Age +25</span><span class="mchip">Gender +20</span><span class="mchip">State +20</span><span class="mchip">Location +10</span><span class="mchip dim">Description pending</span><span class="mchip dim">Name —</span>
+            </div>
+            <p style="font-size:.46em;margin:12px 0 0;color:#8a6420"><b>Conflict:</b> name not given · description semantic-pending (offline)</p>
+            <p style="font-size:.48em;margin:8px 0 0;color:var(--navy);font-weight:600">⟶ verify name + photo — <b>POSSIBLE</b> match, volunteer confirms</p>
+          </div>
+          <p class="muted" style="font-size:.5em;margin-top:14px;line-height:1.5">
+            One <code style="color:var(--gold)">config-scoring.json</code> drives <b style="color:var(--ink)">both</b> the offline engine and Claude. Change a weight → behaviour changes everywhere. No redeploy, no drift.
+          </p>
+        </div>
+      </div>
+      <aside class="notes">The 100 points split is the model in one picture: gold is the only slice Claude does (semantic description) — everything else is deterministic and runs on-device offline. The card is real engine output: unassessable fields (name, description) are excluded with a note and shown as conflicts, never guessed or penalised. Every number lives in config-scoring.json, shared by engine and Claude, so they never drift.</aside>
+    </section>
+
+    <!-- 10 · ACCURACY + HONESTY -->
+    <section data-background-color="#eceff4">
+      <p class="kicker">Does it actually work?</p>
+      <h2>Cross-center recall, measured <span class="grad">honestly</span></h2>
+      <div class="grid2 v-center">
+        <div class="chart-wrap h300"><canvas id="cAcc" data-chart></canvas></div>
+        <div>
+          <div class="grid3">
+            <div class="stat"><div class="num g" style="font-size:1.9em">92%</div><div class="lab" style="font-size:.5em">TWIN IN TOP-3</div></div>
+            <div class="stat"><div class="num g" style="font-size:1.9em">80%</div><div class="lab" style="font-size:.5em">RANKED #1</div></div>
+            <div class="stat"><div class="num g" style="font-size:1.9em">1.18</div><div class="lab" style="font-size:.5em">MEAN RANK</div></div>
+          </div>
+          <p style="font-size:.64em;margin-top:18px" class="muted">The synthetic dup-flag has <b style="color:var(--ink)">no recoverable twin</b> (2/202) and descriptions are noise — so we don't trust it. We <b style="color:var(--ink)">plant a known same-person record</b> at another center under realistic degradation and prove the engine reunites it. Offline, family-known fields only.</p>
+        </div>
+      </div>
+      <aside class="notes">This wins "responsible data" + "system design": we audited the synthetic data, found the dup flag is meaningless, and built a controllable ground-truth experiment instead of quoting a misleading number.</aside>
+    </section>
+
+    <!-- 11 · COMPARISON RADAR (the money slide) -->
+    <section>
+      <p class="kicker">Current system vs KumbhRakshak</p>
+      <h2>A different <span class="grad">capability class</span></h2>
+      <div class="grid2 v-center">
+        <div class="chart-wrap h420"><canvas id="cRadar" data-chart></canvas></div>
+        <div>
+          <table>
+            <tr><th>Capability</th><th>Manual</th><th>Ours</th></tr>
+            <tr><td>Cross-center search</td><td class="no">✗</td><td class="yes">✓</td></tr>
+            <tr><td>Works fully offline</td><td class="no">✗</td><td class="yes">✓</td></tr>
+            <tr><td>Handles no-name cases</td><td class="no">weak</td><td class="yes">✓</td></tr>
+            <tr><td>Multilingual + voice</td><td class="no">manual</td><td class="yes">✓</td></tr>
+            <tr><td>Duplicate / re-report flag</td><td class="no">✗</td><td class="yes">✓</td></tr>
+            <tr><td>Time to surface matches</td><td class="no">minutes–hrs</td><td class="yes">&lt;0.5s</td></tr>
+          </table>
+        </div>
+      </div>
+      <aside class="notes">Radar = relative capability (qualitative). The table is the concrete claim. The honest framing: we speed the SEARCH/MATCH step to sub-second; physical reunification still needs a human, but they now know exactly who and where.</aside>
+    </section>
+
+    <!-- 12 · RESOLUTION TAIL -->
+    <section>
+      <p class="kicker">Where the impact lands</p>
+      <h2>Compressing the <span style="color:var(--red)">dangerous tail</span></h2>
+      <div class="grid2 v-center">
+        <div class="chart-wrap h360"><canvas id="cRes" data-chart></canvas></div>
+        <div>
+          <p class="lead"><b style="color:var(--red)">470 cases</b> took <b>over 6 hours</b> to resolve.</p>
+          <p class="muted" style="font-size:.72em;margin-top:14px">That long tail is overwhelmingly the cross-center cases — found here, searched there. Surfacing the match in <b style="color:var(--ink)">&lt;0.5s</b> is where KumbhRakshak turns 6+ hours into a phone call to the right center.</p>
+        </div>
+      </div>
+      <aside class="notes">Average resolution is 4h, but the tail (>6h) is the human cost — and exactly the cross-center pattern. We don't claim to teleport people; we remove the "who and where" guesswork.</aside>
+    </section>
+
+    <!-- 13 · RESPONSIBLE BY DESIGN -->
+    <section>
+      <p class="kicker">Responsible & deployable by design</p>
+      <h2>Guardrails are <span class="grad">built in</span></h2>
+      <div class="grid2">
+        <div class="card r"><h3 class="no">It will NEVER</h3>
+          <ul style="font-size:.62em;margin:0">
+            <li>Confirm a match — only "possible," volunteer verifies</li>
+            <li>Ask for Aadhaar / PAN / any government ID</li>
+            <li>Store or repeat a reporter's mobile number</li>
+            <li>Decide child custody — escalate to police</li>
+          </ul>
+        </div>
+        <div class="card t"><h3 class="yes">It ALWAYS</h3>
+          <ul style="font-size:.62em;margin:0">
+            <li>Auto-escalates: child, health condition, case &gt; 6h</li>
+            <li>Flags ≥3 reports of one person (trafficking, sensitively)</li>
+            <li>Runs offline: PouchDB ⇄ CouchDB peer sync</li>
+            <li>Stays deterministic & parseable under spike</li>
+          </ul>
+        </div>
+      </div>
+      <aside class="notes">Privacy by design + human-in-the-loop is exactly the rubric's "responsible data handling." The NEVER block is a hard constraint in the prompt and the engine.</aside>
+    </section>
+
+    <!-- 14 · STACK + RUBRIC -->
+    <section data-background-color="#eceff4">
+      <p class="kicker">Under the hood · why it holds up</p>
+      <h2>Deployable, not a demo</h2>
+      <div class="grid2">
+        <div class="card s"><h3>Stack</h3>
+          <p style="font-size:.62em" class="muted">Zero-dep JS engine (Node + browser) · React + Vite PWA · PouchDB ⇄ CouchDB sync · Web-Speech voice · i18n · Claude <code>opus-4-8</code> for transcribe / translate / semantic / explain.</p>
+        </div>
+        <div class="card t"><h3>Maps to the rubric</h3>
+          <table style="font-size:.82em">
+            <tr><td>Deployability</td><td class="yes">&lt;0.5s · offline</td></tr>
+            <tr><td>Real-world fit</td><td class="yes">92% recall</td></tr>
+            <tr><td>UX</td><td class="yes">phoneless·voice</td></tr>
+            <tr><td>System design</td><td class="yes">dup·offline</td></tr>
+            <tr><td>Responsible data</td><td class="yes">privacy-first</td></tr>
+          </table>
+        </div>
+      </div>
+      <aside class="notes">Backend is swappable — set llm.backend to "local" and the same calls route to an on-box model. Offline, the engine scores everything except the semantic description.</aside>
+    </section>
+
+    <!-- 15 · CLOSE -->
+    <section class="center" data-background-gradient="linear-gradient(135deg,#16284b 0%,#1c2f55 55%,#0f1d3a 100%)">
+      <p class="kicker">Kumbh Mela 2027</p>
+      <h1>Find them <span class="grad">faster.</span></h1>
+      <p class="lead" style="margin-top:22px">Every center, one search. Offline when it matters.<br>Honest about what it knows.</p>
+      <p class="deck" style="margin-top:42px">KumbhRakshak · कुंभरक्षक<br>
+        India's First Claude Impact Lab · Mumbai · 27 June 2026<br>
+        <span style="font-size:.85em">RIIDL, Somaiya Vidyavihar University · with Kumbhathon Foundation &amp; Govt. of Maharashtra</span>
       </p>
-    </div>
-  </section>
+      <aside class="notes">Close on the human outcome — a family reunited in minutes, not hours. Offer the live demo: cli.js or the web app.</aside>
+    </section>
 
-  <!-- 2. WHAT WE BUILD -->
-  <section id="build">
-    <div class="sec-head"><span class="num">02</span><h2>What we build: Setu</h2></div>
-    <p class="sec-intro">An operator-mediated kiosk + a shared matching brain. Three surfaces, one core.</p>
-
-    <div class="grid-3">
-      <div class="card">
-        <h3>① Volunteer Console</h3>
-        <p>A tablet/laptop PWA at every kendra. Two big buttons: <b>I lost someone</b> / <b>I found someone</b>.
-        Voice-first intake in the family's language, auto-transcribed &amp; translated. Photo capture if a found
-        person is present.</p>
-        <span class="pill on">offline PWA</span><span class="pill on">voice + photo</span><span class="pill on">multilingual</span>
-      </div>
-      <div class="card">
-        <h3>② Match Engine</h3>
-        <p>Every new record is scored against the opposite pool (lost ↔ found) across all centers. Tolerant of
-        blanks, phonetic name variants, age-band, gender, language, last-seen zone &amp; time window. Surfaces a
-        ranked shortlist with reasons.</p>
-        <span class="pill on">fuzzy / phonetic</span><span class="pill on">cross-center</span><span class="pill warn">human confirms</span>
-      </div>
-      <div class="card">
-        <h3>③ Ops Map</h3>
-        <p>Live map of cases over the 32 zones, CCTV coverage, chokepoints &amp; nearest police station. Shows
-        where separations cluster so help-points and announcements can be pushed before the surge.</p>
-        <span class="pill on">zone heatmap</span><span class="pill on">routing</span><span class="pill on">hotspot predict</span>
-      </div>
-    </div>
-
-    <div class="card" style="margin-top:8px">
-      <h3>How a reunion flows</h3>
-      <div class="flow">
-        <div class="node"><b>Family reports</b><small>voice, any language</small></div>
-        <span class="arrow">→</span>
-        <div class="node"><b>Volunteer console</b><small>structured record</small></div>
-        <span class="arrow">→</span>
-        <div class="node hi"><b>Match engine</b><small>scores all "found" across centers</small></div>
-        <span class="arrow">→</span>
-        <div class="node"><b>Shortlist + reasons</b><small>shown to both desks</small></div>
-        <span class="arrow">→</span>
-        <div class="node"><b>Human confirms</b><small>reunion / route to police</small></div>
-      </div>
-      <p class="muted-note" style="margin-top:8px">The machine never auto-reunites. It ranks; a trained volunteer decides. That is both safer and the right privacy posture.</p>
-    </div>
-  </section>
-
-  <!-- 3. INTERACTIVE MATCH DEMO -->
-  <section id="demo">
-    <div class="sec-head"><span class="num">03</span><h2>The core, made tangible</h2></div>
-    <p class="sec-intro">
-      This is the whole product in one screen. Left = a "lost" report filed by a panicked family at Ramkund.
-      Right = a "found" elderly man logged by a volunteer at Adgaon, 4km away. Today these two never meet.
-      Press <b>Run match</b> to see what Setu would surface — note it works even with a missing name and a different language label.
-    </p>
-
-    <div class="demo">
-      <div class="demo-row">
-        <div class="rec">
-          <div class="tag">LOST · filed at Ramkund Kendra</div>
-          <div class="name" id="lostName">Ram— (name unsure)</div>
-          <table>
-            <tr><td>Gender</td><td>Male</td></tr>
-            <tr><td>Age band</td><td>71–80</td></tr>
-            <tr><td>Language</td><td>Bhojpuri</td></tr>
-            <tr><td>Last seen</td><td>near Ramkund ghat</td></tr>
-            <tr><td>Description</td><td>white kurta, grey hair, hard of hearing</td></tr>
-            <tr><td>Reported</td><td>09:40, Amrit Snan day</td></tr>
-          </table>
-        </div>
-
-        <div class="match-line">
-          <div class="score-ring" id="ring" style="background:var(--gray-300)">—</div>
-          <div id="ringLbl">not run</div>
-        </div>
-
-        <div class="rec">
-          <div class="tag">FOUND · logged at Adgaon Kho-Ya-Paya</div>
-          <div class="name">Unknown male</div>
-          <table>
-            <tr><td>Gender</td><td>Male</td></tr>
-            <tr><td>Age (est.)</td><td>~75</td></tr>
-            <tr><td>Language</td><td>Hindi / Bhojpuri</td></tr>
-            <tr><td>Found at</td><td>Zone 7 transfer node</td></tr>
-            <tr><td>Description</td><td>elderly, white clothes, grey hair, repeating "Ramkund"</td></tr>
-            <tr><td>Logged</td><td>11:15, same day</td></tr>
-          </table>
-        </div>
-      </div>
-
-      <div class="demo-controls">
-        <button class="act" onclick="runMatch()">Run match</button>
-        <button class="ghost" onclick="resetMatch()">Reset</button>
-        <span class="muted-note" id="hint">tip: the name is missing on the found record — most systems would never connect these two.</span>
-      </div>
-      <div class="verdict" id="verdict" style="display:none"></div>
-    </div>
-
-    <div class="card" style="margin-top:16px">
-      <h3>What the score is actually made of</h3>
-      <ul class="clean">
-        <li><b>Phonetic / fuzzy name</b> (Soundex-style + edit distance) so <i>Ram, Raam, Rama</i> collapse together; skipped gracefully when blank.</li>
-        <li><b>Hard filters</b> gender + age-band overlap — cheap, cuts the pool fast.</li>
-        <li><b>Spatio-temporal plausibility</b> last-seen zone vs found zone, walkable in the time gap (32 zone centroids + <code>Area_Boundaries.geojson</code> polygons + 21 ghat/transit sub-areas for landmark resolution).</li>
-        <li><b>Description embedding</b> "white clothes / grey hair / asking for Ramkund" matched semantically with a pre-trained multilingual model — <i>not</i> trained from scratch, per the brief.</li>
-        <li><b>Duplicate detection</b> same logic flags the 8% of records that are the same person across centers, cleaning the registry as it grows.</li>
-      </ul>
-    </div>
-  </section>
-
-  <!-- 4. SYSTEM DESIGN -->
-  <section id="system">
-    <div class="sec-head"><span class="num">04</span><h2>System design — offline &amp; messy by default</h2></div>
-    <p class="sec-intro">The brief grades offline survival and dirty-data handling. We design for both first, not as an afterthought.</p>
-    <div class="grid-2">
-      <div class="card">
-        <h3>Offline-first, sync-when-you-can</h3>
-        <ul class="clean">
-          <li>Each console is a PWA backed by <b>PouchDB</b> in the browser. It works fully with zero signal.</li>
-          <li>PouchDB ↔ <b>CouchDB</b> (on a kendra box) replicate continuously — multi-master, revision-based conflict handling built in. No hand-rolled sync layer.</li>
-          <li>When signal returns, every console converges automatically; the <b>rules engine</b> scores on-device offline, and Claude re-scores the semantic/language fields once back online.</li>
-          <li>Fallback for total blackout: printed QR "case cards" a runner physically carries between kendras.</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>Messy / incomplete data</h3>
-        <ul class="clean">
-          <li>No required name or mobile — the matcher down-weights, never blocks. (15% no name, 20% no mobile in the data.)</li>
-          <li>Free-text descriptions normalized via the LLM into structured tags at intake.</li>
-          <li>Language is a signal, not a barrier: store original + English; match across both.</li>
-          <li>Duplicate-aware: 8% cross-center dupes are detected and merged, not double-counted.</li>
-        </ul>
-      </div>
-    </div>
-    <div class="card">
-      <h3>Architecture (deliberately boring = deployable)</h3>
-      <div class="flow">
-        <div class="node"><b>Console PWA</b><small>React + PouchDB</small></div>
-        <span class="arrow">↔</span>
-        <div class="node hi"><b>CouchDB</b><small>kendra box · multi-master sync</small></div>
-        <span class="arrow">→</span>
-        <div class="node"><b>Rules engine</b><small>JS · config-driven · offline</small></div>
-        <span class="arrow">→</span>
-        <div class="node"><b>LlmBackend</b><small>Claude now · local LLM later</small></div>
-      </div>
-      <p class="muted-note" style="margin-top:8px">PouchDB/CouchDB give real offline-first replication for free — the 2-tab "two centers" sync is the DB's native mode, not bolted on. A <b>config-driven rules engine</b> does the deterministic scoring on-device (always available, even offline). The <b>LlmBackend</b> is a swappable interface: Claude does the language-heavy lifting now (transcribe→translate→structure→explain a match, semantic description overlap); a local LLM drops into the same interface later for fully on-box, no-internet operation. No GPU, no model training.</p>
-    </div>
-  </section>
-
-  <!-- 4b. CONFIGURABLE AI ENGINE -->
-  <section id="config">
-    <div class="sec-head"><span class="num">4b</span><h2>The AI is fully configurable</h2></div>
-    <p class="sec-intro">
-      No scoring weight, threshold, or rule is hard-coded. Every knob lives in one <b>config document in CouchDB</b>
-      that replicates to every console — edit once, applies everywhere, available offline. Both the rules engine
-      and the LLM prompt read from it, so the system tunes without a redeploy.
-    </p>
-    <div class="grid-2">
-      <div class="card">
-        <h3>What's tunable</h3>
-        <ul class="clean">
-          <li><b>Field weights</b> — age, gender, state, description, location, time, name point values.</li>
-          <li><b>Confidence bands</b> — HIGH / MEDIUM / LOW cutoffs + the minimum score to return.</li>
-          <li><b>Cluster rules</b> — open-cases threshold &amp; radius that mark a chokepoint zone "danger" (Mode C); tie-break by <code>risk_level</code>.</li>
-          <li><b>Escalation rules</b> — child age ceiling, hours-open trigger, duplicate-count trigger.</li>
-          <li><b>Adjacency</b> — which age-bands and zones count as "adjacent" for partial credit.</li>
-        </ul>
-      </div>
-      <div class="card">
-        <h3>Why it matters here</h3>
-        <ul class="clean">
-          <li><b>One source of truth</b> — rules engine (offline) and Claude (online) score identically; no drift.</li>
-          <li><b>Field-tunable</b> — ops can dial sensitivity on a snan-day surge without a developer.</li>
-          <li><b>Auditable &amp; responsible</b> — the scoring policy is data, versioned in CouchDB, reviewable.</li>
-          <li><b>Future-proof</b> — same config feeds the local-LLM backend when it replaces Claude.</li>
-        </ul>
-      </div>
-    </div>
-    <div class="card" style="border-color:var(--accent)">
-      <h3>The config doc (replicated to every console)</h3>
-      <pre style="font-family:var(--mono);font-size:12.5px;color:var(--ink);white-space:pre-wrap;margin:0;line-height:1.5">{
-  "_id": "config:scoring", "version": 3,
-  "weights":   { "age": 25, "gender": 20, "state": 20, "description": 20,
-                 "location": 10, "time": 5, "nameExact": 10, "namePhonetic": 5 },
-  "scoreCap":  100,
-  "bands":     { "high": 75, "medium": 50, "low": 30 },
-  "timeWindowHours": 6,
-  "adjacency": { "ageBands": [["41-60","61-70"],["61-70","71-80"],["71-80","80+"]] },
-  "cluster":   { "minOpenCases": 3, "radiusMeters": 300, "trafficChokepointsOnly": true },
-  "escalation":{ "childAgeMax": 12, "childHours": 2, "unresolvedHours": 6, "dupReports": 3 },
-  "llm":       { "backend": "claude", "model": "claude-opus-4-8",
-                 "useFor": ["transcribe","translate","structure","semanticDescription","explain"],
-                 "languages": ["en","hi","mr"] }
-}</pre>
-      <p class="muted-note" style="margin-top:8px">Swap <code>"backend": "claude"</code> → <code>"local"</code> in the future and nothing else changes. Offline, the rules engine reads <code>weights/bands/adjacency</code> directly; the <code>description</code> points are filled in by the LlmBackend when reachable.</p>
-    </div>
-  </section>
-
-  <!-- 5. RESPONSIBLE DATA -->
-  <section id="privacy">
-    <div class="sec-head"><span class="num">05</span><h2>Privacy by design</h2></div>
-    <p class="sec-intro">Missing-person data is among the most sensitive there is. We treat that as a feature constraint, not a checkbox.</p>
-    <ul class="clean">
-      <li><b>Minimal collection</b> — only what helps reunite. No Aadhaar, no caste, no permanent biometric store.</li>
-      <li><b>Found-person photos are ephemeral</b> — used for the match window, auto-purged on reunion or after the mela. Never published to a public wall.</li>
-      <li><b>No public search</b> — only authenticated volunteers query. Families get results through a person, removing the trafficking/scam risk of an open lost-children database.</li>
-      <li><b>Human in the loop on every reunion</b> — the model proposes, a trained volunteer + ID check confirms before handover.</li>
-      <li><b>Consent &amp; audit</b> — every record logs who created/accessed it; data scoped to the event and deleted after.</li>
-      <li><b>Synthetic-only in the demo</b> — we ship and present on the 2,500 fake records; zero real PII touched.</li>
-    </ul>
-  </section>
-
-  <!-- 6. 5-HOUR PLAN -->
-  <section id="timeline">
-    <div class="sec-head"><span class="num">06</span><h2>The 5-hour build — 3 people + Claude</h2></div>
-    <p class="sec-intro">
-      Scope is ruthless: one killer demo path (lost ↔ found cross-center match) end-to-end, fully offline-capable,
-      on the real synthetic data. Everything else is a stretch. Roles:
-      <span class="pill" style="color:#5b8def;border-color:#5b8def">A · Data + Matcher</span>
-      <span class="pill" style="color:var(--olive);border-color:var(--olive)">B · Console UX</span>
-      <span class="pill" style="color:var(--rust);border-color:var(--rust)">C · Map + Glue + Deploy</span>
-    </p>
-    <div class="tl">
-      <div class="tl-block">
-        <div class="tl-time">0:00–0:30</div>
-        <div class="tl-body">
-          <div class="tl-who who-all">ALL</div>
-          <h4>Align &amp; freeze scope</h4>
-          <p>Lock the demo script (the Ramkund↔Adgaon reunion). Agree data schema + seed the <code>config:scoring</code> doc. Spin repo, CouchDB (local + hosted), deploy target (Vercel). Claude scaffolds the project skeleton.</p>
-        </div>
-      </div>
-      <div class="tl-block">
-        <div class="tl-time">0:30–2:00</div>
-        <div class="tl-body">
-          <div class="tl-who who-a">A — Data + Matcher</div>
-          <h4>Load CSVs, build the config-driven scorer</h4>
-          <p>Ingest 2,500 records + zones + <code>Area_Boundaries.geojson</code> + chokepoints (with <code>risk_level</code>) into CouchDB. Build the <b>rules engine</b> that reads <code>config:scoring</code> (weights/bands/adjacency) — name-phonetic + age/gender + zone-time plausibility. Wrap Claude behind <code>LlmBackend</code> for the semantic-description points. Validate it finds the 8% known dupes.</p>
-        </div>
-      </div>
-      <div class="tl-block">
-        <div class="tl-time">0:30–2:30</div>
-        <div class="tl-body">
-          <div class="tl-who who-b">B — Console UX</div>
-          <h4>Lost / Found intake PWA</h4>
-          <p>Two-button home, voice capture (Web Speech) → Claude transcribe/translate/structure. Big-type, high-contrast, icon-led for low-literacy. <b>PouchDB</b> offline store + service worker. UI strings in EN / HI / MR.</p>
-        </div>
-      </div>
-      <div class="tl-block">
-        <div class="tl-time">0:30–2:30</div>
-        <div class="tl-body">
-          <div class="tl-who who-c">C — Map + Glue</div>
-          <h4>Ops map + sync layer</h4>
-          <p>Leaflet map: 32 zone polygons from <code>Area_Boundaries.geojson</code>, 1,280 CCTV, chokepoints sized/colored by <code>risk_level</code> (26 traffic = triangles), 14 police stations. Open-case dots + cluster heatmap fed by the <b>Mode C hotspot engine</b> (<code>engine/hotspot.js</code>, already built: clusters open cases near Traffic choke-points, risk-priority tie-break, nearest police station). <b>PouchDB↔CouchDB live replication</b> across the two tabs. Nearest-police routing; point-in-polygon for vague last-seen text via <code>geo.resolveLocation</code> + curated <code>Location_Coordinates.csv</code>.</p>
-        </div>
-      </div>
-      <div class="tl-block">
-        <div class="tl-time">2:30–3:30</div>
-        <div class="tl-body">
-          <div class="tl-who who-all">ALL</div>
-          <h4>Integrate the golden path</h4>
-          <p>Console → registry → matcher → shortlist with plain-language reasons → confirm reunion. Make it work end-to-end with the network OFF, then sync back ON.</p>
-        </div>
-      </div>
-      <div class="tl-block">
-        <div class="tl-time">3:30–4:15</div>
-        <div class="tl-body">
-          <div class="tl-who who-all">ALL</div>
-          <h4>Privacy + polish + edge cases</h4>
-          <p>Auth gate, photo auto-purge, audit log. Handle blank name / blank mobile gracefully on screen. EN/HI/MR labels finalized. Offline rules-only path verified (Claude unreachable → still scores). Empty/error states.</p>
-        </div>
-      </div>
-      <div class="tl-block">
-        <div class="tl-time">4:15–5:00</div>
-        <div class="tl-body">
-          <div class="tl-who who-all">ALL</div>
-          <h4>Deploy + stress test + rehearse</h4>
-          <p>Ship to Vercel + CouchDB. Seed demo records. <b>Offline stress test</b> (network off → register 5 cases → re-enable → confirm all sync across both tabs). <b>Spike test</b> (loadAllData ×5 → search still &lt;3s). Run the 3 demo scenarios live; cut a 90s backup video.</p>
-        </div>
-      </div>
-    </div>
-    <div class="card" style="margin-top:8px;border-color:var(--rust)">
-      <h3>Cut-lines (if behind)</h3>
-      <p style="margin:0">Drop in this order: hotspot prediction (Mode C) → voice (fall back to typed + language dropdown) → map polish → live config-editing UI (config doc still works, just edited by hand). <b>Never cut:</b> the cross-center match, offline + 2-tab sync working once, and the privacy story. Those three <i>are</i> the judging criteria. (Sync is no longer a cut candidate — CouchDB gives it for free.)</p>
-    </div>
-  </section>
-
-  <!-- 7. CRITERIA MAP -->
-  <section id="criteria">
-    <div class="sec-head"><span class="num">07</span><h2>How it scores against the rubric</h2></div>
-    <table class="crit">
-      <tr><th>Criterion</th><th>How Setu wins it</th></tr>
-      <tr><td>Deployability</td><td>Boring, cheap stack (CouchDB + PouchDB PWA + Claude). Runs on one kendra box; consoles run on-device and sync peer-to-peer. Maps onto the kendras &amp; volunteers that <i>already exist</i> — no new hardware for pilgrims. LLM backend swaps Claude→local for fully offline ops.</td></tr>
-      <tr><td>Real-world fit</td><td>Targets the exact failure the brief names: no cross-center search. Designed around the actual missing person (elderly, phoneless, can't self-report) not an idealized app user.</td></tr>
-      <tr><td>UX</td><td>Operator-mediated so phoneless/non-literate elders are served by a human. Voice-in, multilingual, big-type, two-button, icon-led. Family never needs literacy or a device.</td></tr>
-      <tr><td>System design</td><td>Offline-first via PouchDB/CouchDB multi-master replication + QR runner fallback. Config-driven scoring (one replicated doc) means rules engine and LLM never drift. Tolerant of 15% no-name / 20% no-mobile; dedups the 8% cross-center duplicates. Holds &lt;3s under 5× spike.</td></tr>
-      <tr><td>Responsible data</td><td>Minimal collection, no public wall, ephemeral photos, human-confirmed reunions, full audit, synthetic-only demo. Privacy is a constraint baked into the architecture.</td></tr>
-    </table>
-  </section>
-
-  <section id="decided">
-    <div class="sec-head"><span class="num">08</span><h2>Decisions — locked</h2></div>
-    <p class="sec-intro">No open forks. The team builds against these.</p>
-    <table class="crit">
-      <tr><th>Decision</th><th>Locked choice</th></tr>
-      <tr><td>Storage + sync</td><td><b>CouchDB + PouchDB</b> — real multi-master replication; the 2-tab "two centers" demo is the DB's native mode.</td></tr>
-      <tr><td>AI backend</td><td><b>Claude now</b>, behind a swappable <code>LlmBackend</code> interface. <b>Local LLM later</b> drops into the same interface for fully on-box operation.</td></tr>
-      <tr><td>Scoring config</td><td><b>Fully configurable</b> — weights, bands, cluster &amp; escalation rules live in one <code>config:scoring</code> doc in CouchDB, replicated to every console. No hard-coded numbers.</td></tr>
-      <tr><td>Offline behavior</td><td><b>Rules engine</b> scores offline from config; Claude adds semantic + translation when online. Search never blocks.</td></tr>
-      <tr><td>Languages</td><td><b>English · Hindi · Marathi</b> (UI strings + Claude translation).</td></tr>
-      <tr><td>Demo</td><td><b>Live on stage</b> — 3 scenarios; 90s recorded backup if wifi fails.</td></tr>
-    </table>
-  </section>
-
-  <div class="footer">
-    Setu · Claude Impact Lab Mumbai 2026 · plan built on the provided synthetic dataset (2,500 records, 1,280 cameras, 32 zone polygons + 21 ghat/transit areas, 14 police stations, 85 chokepoints with risk metadata). All missing-person data is fake.
-    <br>Jump to: <a class="jump" href="#problem">problem</a> · <a class="jump" href="#build">build</a> · <a class="jump" href="#demo">demo</a> · <a class="jump" href="#system">system</a> · <a class="jump" href="#config">config</a> · <a class="jump" href="#privacy">privacy</a> · <a class="jump" href="#timeline">5-hour plan</a> · <a class="jump" href="#criteria">rubric</a> · <a class="jump" href="#decided">decisions</a>
   </div>
-
 </div>
 
-<script>
-  function toggleTheme() {
-    var d = document.documentElement.classList.toggle('dark');
-    try { localStorage.setItem('theme', d ? 'dark' : 'light'); } catch(e){}
-    syncIcon();
-  }
-  function syncIcon() {
-    var d = document.documentElement.classList.contains('dark');
-    document.getElementById('tIcon').textContent = d ? '☾' : '☀';
-    document.getElementById('tLbl').textContent = d ? 'dark' : 'light';
-  }
-  syncIcon();
+<div class="footer">KumbhRakshak · कुंभरक्षक</div>
 
-  function runMatch() {
-    var ring = document.getElementById('ring');
-    var lbl = document.getElementById('ringLbl');
-    var v = document.getElementById('verdict');
-    var target = 91;
-    ring.style.background = 'var(--olive)';
-    ring.style.transform = 'scale(1.05)';
-    lbl.textContent = 'strong match';
-    var n = 0;
-    var iv = setInterval(function(){
-      n += 3;
-      if (n >= target) { n = target; clearInterval(iv); ring.style.transform = 'scale(1)'; }
-      ring.textContent = n + '%';
-    }, 22);
-    v.style.display = 'block';
-    v.innerHTML = "<b>91% — likely the same person.</b> Matched on: male + 71–80 age overlap, "
-      + "Bhojpuri language, white clothes &amp; grey hair (semantic), and “asking for Ramkund” ↔ last seen Ramkund ghat. "
-      + "Found at Zone 7 transfer node, walkable from Ramkund within the 95-min gap. "
-      + "<i>Name was blank on the found record — the match still holds. Shown to both desks; a volunteer confirms with an ID check before handover.</i>";
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@4/plugin/notes/notes.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+  Reveal.initialize({
+    hash:true, slideNumber:'c/t', transition:'slide', backgroundTransition:'fade',
+    width:1180, height:740, margin:0.05, controls:true, progress:true,
+    plugins:[RevealHighlight, RevealNotes]
+  });
+
+  // ---- Chart.js theming (corporate navy + gold, light) ----
+  const C = window.Chart;
+  C.defaults.color = '#56607d';
+  C.defaults.font.family = "'Inter', sans-serif";
+  C.defaults.font.size = 13;
+  C.defaults.plugins.legend.labels.usePointStyle = true;
+  C.defaults.plugins.legend.labels.boxWidth = 10;
+  const NAVY='#16284b', NAVY2='#2f4576', GOLD='#b8862f', GOLDS='#caa14b', GREEN='#1e8e5a', RED='#c0392b', BLUE='#2f5b9c', GREY='rgba(22,40,75,.10)', EMPTY='rgba(22,40,75,.07)';
+
+  const builders = {
+    cAge(el){ // real age-band distribution; highlight 61-70
+      const labels=['0-12','13-17','18-40','41-60','61-70','71-80','80+'];
+      const data=[201,87,252,506,697,532,225];
+      new C(el,{type:'bar',data:{labels,datasets:[{data,
+        backgroundColor:labels.map(l=> l==='61-70'?GOLD : 'rgba(22,40,75,.45)'),
+        borderRadius:8,borderSkipped:false}]},
+        options:{plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+' cases'}}},
+          scales:{x:{grid:{display:false}},y:{grid:{color:GREY},ticks:{callback:v=>v}}}}});
+    },
+    cStatus(el){ // real status split
+      new C(el,{type:'doughnut',data:{labels:['Reunited','Pending','Hospital transfer','Unresolved'],
+        datasets:[{data:[2150,210,73,67],backgroundColor:[NAVY,GOLD,BLUE,RED],borderColor:'#ffffff',borderWidth:3,hoverOffset:8}]},
+        options:{cutout:'62%',plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>c.label+': '+c.raw+' ('+(c.raw/25).toFixed(1)+'%)'}}}}});
+    },
+    cGaps(el){
+      new C(el,{type:'bar',data:{labels:['No name','No mobile','Cross-center duplicate'],
+        datasets:[{data:[14.8,19.7,8.1],backgroundColor:[NAVY,GOLD,BLUE],borderRadius:8}]},
+        options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+'% of records'}}},
+          scales:{x:{grid:{color:GREY},ticks:{callback:v=>v+'%'},max:25},y:{grid:{display:false}}}}});
+    },
+    cAcc(el){
+      new C(el,{type:'doughnut',data:{labels:['Twin found in Top-3','Missed'],
+        datasets:[{data:[92,8],backgroundColor:[GOLD,EMPTY],borderWidth:0}]},
+        options:{cutout:'74%',rotation:-90,circumference:360,plugins:{legend:{display:false},
+          tooltip:{callbacks:{label:c=>c.label+': '+c.raw+'%'}}}},
+        plugins:[{id:'ctr',afterDraw(ch){const{ctx,chartArea:{left,right,top,bottom}}=ch;ctx.save();
+          ctx.fillStyle=GOLD;ctx.font='800 46px "Plus Jakarta Sans"';ctx.textAlign='center';ctx.textBaseline='middle';
+          ctx.fillText('92%',(left+right)/2,(top+bottom)/2-6);
+          ctx.fillStyle='#56607d';ctx.font='600 14px Inter';ctx.fillText('TOP-3 RECALL',(left+right)/2,(top+bottom)/2+26);ctx.restore();}}]});
+    },
+    cRadar(el){
+      new C(el,{type:'radar',data:{labels:['Cross-center','Offline',['Multilingual','+ voice'],['No-name','matching'],['Duplicate','detection'],['Match','speed']],
+        datasets:[
+          {label:'Manual lost & found',data:[8,30,25,20,5,18],backgroundColor:'rgba(192,57,43,.14)',borderColor:RED,pointBackgroundColor:RED,borderWidth:2},
+          {label:'KumbhRakshak',data:[96,92,90,86,90,98],backgroundColor:'rgba(184,134,47,.20)',borderColor:GOLD,pointBackgroundColor:GOLD,borderWidth:2}
+        ]},
+        options:{plugins:{legend:{position:'bottom'}},scales:{r:{min:0,max:100,grid:{color:GREY},angleLines:{color:GREY},
+          pointLabels:{color:NAVY,font:{size:12,weight:'600'}},ticks:{display:false,stepSize:25}}}}});
+    },
+    cRes(el){
+      new C(el,{type:'bar',data:{labels:['<2h','2–4h','4–6h','>6h'],
+        datasets:[{data:[826,506,322,470],backgroundColor:[GREEN,GOLDS,GOLD,RED],borderRadius:8}]},
+        options:{plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+' cases'}}},
+          scales:{x:{grid:{display:false}},y:{grid:{color:GREY}}}}});
+    }
+  };
+
+  const done=new Set();
+  function renderVisible(){
+    document.querySelectorAll('.reveal section.present canvas[data-chart]').forEach(el=>{
+      if(done.has(el.id)) return;
+      const fn=builders[el.id]; if(fn){ fn(el); done.add(el.id); }
+    });
   }
-  function resetMatch() {
-    var ring = document.getElementById('ring');
-    ring.style.background = 'var(--gray-300)';
-    ring.textContent = '—';
-    ring.style.transform = 'scale(1)';
-    document.getElementById('ringLbl').textContent = 'not run';
-    document.getElementById('verdict').style.display = 'none';
-  }
+  Reveal.on('ready', renderVisible);
+  Reveal.on('slidechanged', renderVisible);
 </script>
 </body>
 </html>
